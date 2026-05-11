@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     "name": "Shopall Backend Theme",
-    "version": "19.0.1.0.4",
+    "version": "19.0.1.0.5",
     "category": "Theme/Backend",
     "summary": "Dashboard-style backend shell: sidebar apps, two-row navbar, accent colors",
     "depends": ["web", "mail"],
@@ -13,12 +13,16 @@
         "security/ir.model.access.csv",
         "views/shopall_theme_menu_cleanup.xml",
         "views/shopall_theme_settings_views.xml",
+        "views/shopall_auth_templates.xml",
         "views/shopall_dashboard_action.xml",
     ],
     "assets": {
         "web._assets_primary_variables": [
             "web_shopall_theme/static/src/scss/shopall_primary.variables.scss",
             "web_shopall_theme/static/src/scss/shopall_navbar.variables.scss",
+        ],
+        "web.assets_frontend": [
+            "web_shopall_theme/static/src/scss/shopall_auth.scss",
         ],
         # Patches and QWeb must stay in assets_backend so they execute before web/static/src/main.js.
         "web.assets_backend": [

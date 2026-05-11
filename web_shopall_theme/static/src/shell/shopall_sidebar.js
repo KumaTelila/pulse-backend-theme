@@ -252,6 +252,11 @@ export class ShopallSidebar extends Component {
     }
 
     isAppActive(app) {
+        // Overview is a client action outside the app menu tree; getCurrentApp()
+        // can remain the last app (e.g. Sales), so never mark an app row active on Overview.
+        if (this.isDashboardActive()) {
+            return false;
+        }
         return this.menuService.getCurrentApp() === app;
     }
 

@@ -1,0 +1,82 @@
+// Login / signup / reset password (web.login_layout → web.frontend_layout)
+// Defaults match HTML design; :root --shopall-* overridden per-request in shopall_auth_templates.xml.
+
+:root {
+    --shopall-primary: #5b4fec;
+    --shopall-text: #1a1a2e;
+    --shopall-muted: #6b7280;
+    --shopall-canvas: #f4f5f7;
+    --shopall-border: #eaecf0;
+}
+
+// Only auth screens (wrapwrap gets class o_shopall_auth from login_layout inherit).
+body:has(#wrapwrap.o_shopall_auth) {
+    font-family:
+        "Segoe UI",
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
+    background-color: var(--shopall-canvas) !important;
+}
+
+#wrapwrap.o_shopall_auth {
+    min-height: 100vh;
+    color: var(--shopall-text);
+
+    main {
+        background-color: transparent;
+    }
+
+    .card {
+        background-color: #fff !important;
+        box-shadow: 0 4px 24px rgba(26, 26, 46, 0.06);
+    }
+
+    .field-login label,
+    .form-label {
+        color: var(--shopall-text);
+    }
+
+    .form-control {
+        border-color: var(--shopall-border);
+
+        &:focus {
+            border-color: var(--shopall-primary);
+            box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--shopall-primary) 22%, transparent);
+        }
+    }
+
+    .btn-primary {
+        background-color: var(--shopall-primary) !important;
+        border-color: var(--shopall-primary) !important;
+
+        &:hover,
+        &:focus {
+            background-color: color-mix(in srgb, var(--shopall-primary) 72%, #000) !important;
+            border-color: color-mix(in srgb, var(--shopall-primary) 72%, #000) !important;
+        }
+    }
+
+    a:not(.btn) {
+        color: var(--shopall-primary);
+
+        &:hover {
+            color: color-mix(in srgb, var(--shopall-primary) 72%, #000);
+        }
+    }
+
+    .btn-link {
+        color: var(--shopall-primary);
+    }
+
+    .border-bottom,
+    .border-top {
+        border-color: var(--shopall-border) !important;
+    }
+
+    .text-muted,
+    small.text-muted {
+        color: var(--shopall-muted) !important;
+    }
+}

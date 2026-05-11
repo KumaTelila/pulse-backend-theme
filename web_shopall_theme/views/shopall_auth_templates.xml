@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Auth pages share web.login_layout; tag wrap + inject CSS vars from General Settings -->
+    <template id="shopall_login_layout" inherit_id="web.login_layout" name="Shopall auth layout">
+        <xpath expr="//t[@t-call='web.frontend_layout']" position="inside">
+            <t t-set="pageName" t-value="'o_shopall_auth'"/>
+        </xpath>
+        <xpath expr="//div[@class='container py-5']" position="before">
+            <t t-set="shopall_theme_auth" t-value="request.env['ir.http'].shopall_theme_for_portal()"/>
+            <style type="text/css">
+:root {
+  --shopall-primary: <t t-esc="shopall_theme_auth.get('primary')"/>;
+  --shopall-text: <t t-esc="shopall_theme_auth.get('text')"/>;
+  --shopall-muted: <t t-esc="shopall_theme_auth.get('muted')"/>;
+  --shopall-canvas: <t t-esc="shopall_theme_auth.get('canvas')"/>;
+  --shopall-border: <t t-esc="shopall_theme_auth.get('border')"/>;
+}
+            </style>
+        </xpath>
+    </template>
+</odoo>
