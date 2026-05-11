@@ -143,11 +143,8 @@
                 </t>
             </nav>
 
-            <!-- Bottom profile block (fixed under scroll area, matches design HTML). -->
+            <!-- Bottom action block (fixed under scroll area). -->
             <div class="o_shopall_sidebar_bottom flex-shrink-0">
-                <div class="o_shopall_sidebar_profile_label o_shopall_sidebar_label">
-                    Profile
-                </div>
                 <a
                     href="#"
                     class="o_shopall_sidebar_footer_item"
@@ -157,29 +154,6 @@
                     <i class="fa fa-sign-out" aria-hidden="true"/>
                     <span class="o_shopall_sidebar_label">Log out</span>
                 </a>
-                <div class="o_shopall_sidebar_footer">
-                    <button
-                        type="button"
-                        class="o_shopall_sidebar_user_card"
-                        t-on-click="(ev) => this.onUserCardClick(ev)"
-                    >
-                        <img
-                            t-if="userAvatarSrc"
-                            class="o_shopall_sidebar_user_avatar_img rounded-circle"
-                            t-att-src="userAvatarSrc"
-                            alt=""
-                        />
-                        <div
-                            t-else=""
-                            class="o_shopall_sidebar_user_avatar rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
-                            t-esc="userInitials"
-                        />
-                        <div class="o_shopall_sidebar_user_info o_shopall_sidebar_label">
-                            <div class="o_shopall_sidebar_user_name text-truncate" t-esc="userName"/>
-                            <div class="o_shopall_sidebar_user_email text-truncate" t-esc="userEmail"/>
-                        </div>
-                    </button>
-                </div>
             </div>
         </aside>
     </t>

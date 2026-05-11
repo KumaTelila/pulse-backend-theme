@@ -76,7 +76,6 @@ export class ShopallSidebar extends Component {
     setup() {
         this.menuService = useService("menu");
         this.actionService = useService("action");
-        this.orm = useService("orm");
         const initialNarrow = browser.localStorage.getItem(SIDEBAR_NARROW_KEY) === "1";
         this.state = useState({
             expandedApps: {},
@@ -151,35 +150,6 @@ export class ShopallSidebar extends Component {
 
     onCompanyHeaderLogoError() {
         this.state.companyLogoFailed = true;
-    }
-
-    get userName() {
-        return user.name || "";
-    }
-
-    get userEmail() {
-        return user.login || "";
-    }
-
-    get userInitials() {
-        const n = this.userName.trim();
-        if (!n) {
-            return "?";
-        }
-        const parts = n.split(/\s+/).filter(Boolean);
-        if (parts.length >= 2) {
-            return (parts[0][0] + parts[1][0]).toUpperCase();
-        }
-        return n.slice(0, 2).toUpperCase();
-    }
-
-    get userAvatarSrc() {
-        if (!user.partnerId) {
-            return "";
-        }
-        return imageUrl("res.partner", user.partnerId, "avatar_128", {
-            unique: user.writeDate,
-        });
     }
 
     get discussMenu() {
@@ -271,12 +241,6 @@ export class ShopallSidebar extends Component {
         await this.actionService.doAction("web_shopall_theme.action_shopall_dashboard");
     }
 
-    async openMyPreferences() {
-        const actionDescription = await this.orm.call("res.users", "action_get");
-        actionDescription.res_id = user.userId;
-        await this.actionService.doAction(actionDescription);
-    }
-
     async onDiscussClick(ev) {
         ev.preventDefault();
         const menu = this.discussMenu;
@@ -287,19 +251,9 @@ export class ShopallSidebar extends Component {
         }
     }
 
-    async onPreferencesClick(ev) {
-        ev.preventDefault();
-        await this.openMyPreferences();
-    }
-
     onLogoutClick(ev) {
         ev.preventDefault();
         browser.location.href = "/web/session/logout";
-    }
-
-    async onUserCardClick(ev) {
-        ev.preventDefault();
-        await this.openMyPreferences();
     }
 
     /**

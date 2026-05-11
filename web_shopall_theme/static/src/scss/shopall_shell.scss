@@ -157,11 +157,6 @@ body.o_shopall_theme.o_shopall_sidebar_collapsed {
         justify-content: center;
     }
 
-    .o_shopall_sidebar_user_card {
-        justify-content: center;
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
-    }
 }
 
 // Narrow sidebar: Odoo Dropdown popover for app submenu (labels visible; not under .o_shopall_sidebar_narrow).
@@ -235,9 +230,9 @@ body.o_shopall_theme.o_shopall_sidebar_collapsed {
     padding: 8px 12px;
     margin: 1px 8px;
     margin-top: 6px;
-    color: var(--shopall-muted, #6b7280);
+    color: var(--shopall-primary, #5b4fec);
     font-size: 13px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     transition: background-color 0.15s ease, color 0.15s ease;
 
@@ -250,6 +245,12 @@ body.o_shopall_theme.o_shopall_sidebar_collapsed {
         background: var(--shopall-primary-light, #ede9fd);
         color: var(--shopall-primary, #5b4fec);
         font-weight: 600;
+    }
+
+    i {
+        width: 20px;
+        text-align: center;
+        flex-shrink: 0;
     }
 }
 
@@ -347,7 +348,7 @@ body.o_shopall_theme.o_shopall_sidebar_collapsed {
 }
 
 // ---------------------------------------------------------------------------
-// Sidebar bottom: Profile + quick links + user card (design HTML)
+// Sidebar bottom action
 // ---------------------------------------------------------------------------
 .o_shopall_sidebar_bottom {
     flex-shrink: 0;
@@ -355,15 +356,7 @@ body.o_shopall_theme.o_shopall_sidebar_collapsed {
     background: #fff;
     display: flex;
     flex-direction: column;
-}
-
-.o_shopall_sidebar_profile_label {
-    padding: 8px 12px 4px;
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--shopall-muted, #6b7280);
+    padding: 8px 0;
 }
 
 .o_shopall_sidebar_footer_item {
@@ -390,62 +383,6 @@ body.o_shopall_theme.o_shopall_sidebar_collapsed {
         text-align: center;
         flex-shrink: 0;
     }
-}
-
-.o_shopall_sidebar_footer {
-    margin-top: auto;
-    padding: 12px;
-    border-top: 1px solid var(--shopall-border, #eaecf0);
-}
-
-.o_shopall_sidebar_user_card {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    width: 100%;
-    padding: 8px;
-    border: none;
-    border-radius: 6px;
-    background: transparent;
-    text-align: left;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-
-    &:hover {
-        background: var(--shopall-canvas, #f4f5f7);
-    }
-}
-
-.o_shopall_sidebar_user_avatar,
-.o_shopall_sidebar_user_avatar_img {
-    width: 32px;
-    height: 32px;
-    flex-shrink: 0;
-}
-
-.o_shopall_sidebar_user_avatar {
-    font-size: 11px;
-    background: var(--shopall-primary, #5b4fec);
-}
-
-.o_shopall_sidebar_user_avatar_img {
-    object-fit: cover;
-}
-
-.o_shopall_sidebar_user_info {
-    flex: 1;
-    min-width: 0;
-}
-
-.o_shopall_sidebar_user_name {
-    font-weight: 600;
-    font-size: 12px;
-    color: var(--shopall-text, #1a1a2e);
-}
-
-.o_shopall_sidebar_user_email {
-    font-size: 10px;
-    color: var(--shopall-muted, #6b7280);
 }
 
 // Desktop: apps live in sidebar; hide grid dropdown trigger (mobile keeps o_menu_toggle).
@@ -508,4 +445,141 @@ body.o_shopall_theme .o_switch_company_menu button[data-hotkey="shift+u"] {
 
 .o_shopall_shell_fullscreen .o_shopall_shell_main {
     background: inherit;
+}
+
+// ---------------------------------------------------------------------------
+// HR employee kanban cards
+// ---------------------------------------------------------------------------
+body.o_shopall_theme .o_hr_employee_kanban {
+    .o_kanban_renderer.o_kanban_ungrouped {
+        --KanbanRecord-width: 390px;
+        --KanbanRecord__image--fill-width: 126px;
+        gap: 14px;
+        padding: 18px;
+        background:
+            linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0)),
+            var(--shopall-canvas, #f4f5f7);
+    }
+
+    .o_kanban_renderer.o_kanban_ungrouped .o_kanban_record {
+        margin: 0;
+    }
+
+    .o_kanban_record:not(.o_kanban_ghost):not(.o-kanban-button-new) {
+        min-height: 162px;
+        padding: 0;
+        overflow: hidden;
+        border: 1px solid rgba(91, 79, 236, 0.12);
+        border-radius: 8px;
+        background: #fff;
+        box-shadow: 0 8px 22px rgba(16, 24, 40, 0.06);
+        transition:
+            border-color 0.16s ease,
+            box-shadow 0.16s ease,
+            transform 0.16s ease;
+
+        &::before {
+            content: "";
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 4px;
+            background: var(--shopall-primary, #5b4fec);
+            opacity: 0;
+            transition: opacity 0.16s ease;
+        }
+
+        &:hover {
+            border-color: rgba(91, 79, 236, 0.28);
+            box-shadow: 0 14px 34px rgba(16, 24, 40, 0.12);
+            transform: translateY(-2px);
+
+            &::before {
+                opacity: 1;
+            }
+        }
+    }
+
+    .o_kanban_record > aside.o_kanban_aside_full {
+        --KanbanRecord__image-height: 100%;
+        flex-basis: var(--KanbanRecord__image--fill-width);
+        overflow: hidden;
+        background: color-mix(in srgb, var(--shopall-primary, #5b4fec) 12%, #fff);
+    }
+
+    .o_kanban_record > aside.o_kanban_aside_full > * {
+        margin-top: 0;
+        margin-bottom: 0;
+        margin-left: 0;
+        height: 100%;
+    }
+
+    .o_kanban_record > aside.o_kanban_aside_full .o_field_background_image,
+    .o_kanban_record > aside.o_kanban_aside_full .o_field_background_image > img,
+    .o_kanban_record > aside.o_kanban_aside_full > div {
+        min-height: 162px;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .o_kanban_record > main {
+        padding: 12px 14px 10px 12px;
+        gap: 4px;
+    }
+
+    .o_kanban_record > main.ms-2 {
+        margin-left: 0 !important;
+    }
+
+    .o_kanban_record > main > div:first-child {
+        min-height: 28px;
+        padding-right: 28px;
+
+        .o_field_widget[name="name"],
+        .fw-bold,
+        .fw-bolder {
+            color: var(--shopall-text, #1a1a2e);
+            font-size: 1.05rem !important;
+            line-height: 1.25;
+            letter-spacing: 0;
+        }
+    }
+
+    .o_kanban_record .float-end {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+    }
+
+    .o_kanban_record main > div:not(:first-child),
+    .o_kanban_record main > span,
+    .o_kanban_record main > .o_field_widget {
+        color: var(--shopall-text, #1a1a2e);
+        font-size: 0.9rem;
+        line-height: 1.35;
+    }
+
+    .o_kanban_record i.text-primary {
+        width: 18px;
+        margin-right: 8px !important;
+        color: var(--shopall-primary, #5b4fec) !important;
+        text-align: center;
+        opacity: 0.92;
+    }
+
+    .hr_tags {
+        margin: 6px 0 0;
+    }
+
+    .o_tag {
+        border: 0;
+        border-radius: 999px;
+        padding: 3px 10px;
+        font-size: 0.76rem;
+        font-weight: 650;
+    }
+
+    footer,
+    main > footer {
+        padding-top: 4px;
+    }
 }

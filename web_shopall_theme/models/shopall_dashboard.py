@@ -26,11 +26,12 @@ class ShopallDashboard(models.TransientModel):
         )
 
     @api.model
-    def _period_bounds(self):
+    def _period_bounds(self, period_days=30):
+        days = max(1, min(365, int(period_days or 30)))
         end = fields.Datetime.now()
-        start = end - timedelta(days=30)
+        start = end - timedelta(days=days)
         prev_end = start
-        prev_start = prev_end - timedelta(days=30)
+        prev_start = prev_end - timedelta(days=days)
         return start, end, prev_start, prev_end
 
     @api.model
@@ -58,6 +59,27 @@ class ShopallDashboard(models.TransientModel):
         return base_date
 
     @api.model
+    def _sale_order_row(self, order):
+        line = order.order_line[:1]
+        product = line.product_id
+        categ_name = product.categ_id.name if product and product.categ_id else ""
+        product_name = product.display_name if product else ""
+        partner = order.partner_id
+        return {
+            "id": order.id,
+            "name": order.name,
+            "partner_name": partner.display_name or "",
+            "date_order": fields.Datetime.to_string(order.date_order)
+            if order.date_order
+            else "",
+            "amount_total": order.amount_total,
+            "category": categ_name,
+            "product_name": product_name or order.name,
+            "city": partner.city or "",
+            "state": order.state,
+        }
+
+    @api.model
     def _fill_daily_series(self, start, end, raw_map):
         labels = []
         vals = []
@@ -70,17 +92,265 @@ class ShopallDashboard(models.TransientModel):
         return labels, vals
 
     @api.model
-    def get_data(self, tab="all", table_page=1, page_size=8):
+    def _readable_model(self, model_name):
+        try:
+            Model = self.env[model_name]
+        except KeyError:
+            return None
+        try:
+            Model.check_access("read")
+        except Exception:
+            return None
+        return Model
+
+    @api.model
+    def _model_exists(self, model_name):
+        try:
+            self.env[model_name]
+        except KeyError:
+            return False
+        return True
+
+    @api.model
+    def _safe_count(self, model_name, domain):
+        Model = self._readable_model(model_name)
+        if Model is None:
+            return 0
+        try:
+            return Model.search_count(domain)
+        except Exception:
+            return 0
+
+    @api.model
+    def _safe_sum(self, model_name, domain, field_name):
+        Model = self._readable_model(model_name)
+        if Model is None or field_name not in Model._fields:
+            return 0.0
+        try:
+            rows = Model._read_group(domain, [], [f"{field_name}:sum"])
+        except Exception:
+            return 0.0
+        return float(rows[0][0] or 0.0) if rows else 0.0
+
+    @api.model
+    def _module_payload(self, key, label, icon, metrics, bars):
+        max_value = max([bar["value"] for bar in bars] or [0])
+        for bar in bars:
+            bar["percent"] = round((bar["value"] / max_value) * 100, 1) if max_value else 0
+        return {
+            "key": key,
+            "label": label,
+            "icon": icon,
+            "metrics": metrics,
+            "bars": bars,
+        }
+
+    @api.model
+    def _get_module_overviews(self, start, end):
+        overviews = []
+
+        if self._model_exists("sale.order"):
+            sales_domain = self._base_sale_domain(start, end, ("sale", "done"))
+            quotation_domain = self._base_sale_domain(start, end, ("draft", "sent"))
+            revenue = self._safe_sum("sale.order", sales_domain, "amount_total")
+            order_count = self._safe_count("sale.order", sales_domain)
+            overviews.append(
+                self._module_payload(
+                    "sales",
+                    "Sales",
+                    "fa-shopping-bag",
+                    [
+                        {"label": "Revenue", "value": revenue, "type": "money"},
+                        {"label": "Orders", "value": order_count, "type": "number"},
+                        {
+                            "label": "Quotations",
+                            "value": self._safe_count("sale.order", quotation_domain),
+                            "type": "number",
+                        },
+                        {
+                            "label": "Average Order",
+                            "value": revenue / order_count if order_count else 0.0,
+                            "type": "money",
+                        },
+                    ],
+                    [
+                        {"label": "Confirmed", "value": order_count},
+                        {"label": "Quotations", "value": self._safe_count("sale.order", quotation_domain)},
+                        {
+                            "label": "Cancelled",
+                            "value": self._safe_count(
+                                "sale.order",
+                                self._base_sale_domain(start, end, ("cancel",)),
+                            ),
+                        },
+                    ],
+                )
+            )
+
+        Lead = self.env["crm.lead"] if self._model_exists("crm.lead") else None
+        if Lead:
+            created_domain = [("create_date", ">=", start), ("create_date", "<=", end)]
+            opportunity_domain = created_domain
+            if "type" in Lead._fields:
+                opportunity_domain += [("type", "=", "opportunity")]
+            won_domain = opportunity_domain
+            if (
+                "stage_id" in Lead._fields
+                and self._model_exists("crm.stage")
+                and "is_won" in self.env["crm.stage"]._fields
+            ):
+                won_domain += [("stage_id.is_won", "=", True)]
+            expected = self._safe_sum("crm.lead", opportunity_domain, "expected_revenue")
+            overviews.append(
+                self._module_payload(
+                    "crm",
+                    "CRM",
+                    "fa-handshake-o",
+                    [
+                        {"label": "Leads", "value": self._safe_count("crm.lead", created_domain), "type": "number"},
+                        {"label": "Opportunities", "value": self._safe_count("crm.lead", opportunity_domain), "type": "number"},
+                        {"label": "Won", "value": self._safe_count("crm.lead", won_domain), "type": "number"},
+                        {"label": "Expected", "value": expected, "type": "money"},
+                    ],
+                    [
+                        {"label": "Leads", "value": self._safe_count("crm.lead", created_domain)},
+                        {"label": "Opportunities", "value": self._safe_count("crm.lead", opportunity_domain)},
+                        {"label": "Won", "value": self._safe_count("crm.lead", won_domain)},
+                    ],
+                )
+            )
+
+        if self._model_exists("purchase.order"):
+            date_domain = [("date_order", ">=", start), ("date_order", "<=", end)]
+            rfq_domain = date_domain + [("state", "in", ("draft", "sent", "to approve"))]
+            po_domain = date_domain + [("state", "in", ("purchase", "done"))]
+            total = self._safe_sum("purchase.order", po_domain, "amount_total")
+            overviews.append(
+                self._module_payload(
+                    "purchase",
+                    "Purchase",
+                    "fa-credit-card",
+                    [
+                        {"label": "Spend", "value": total, "type": "money"},
+                        {"label": "Purchase Orders", "value": self._safe_count("purchase.order", po_domain), "type": "number"},
+                        {"label": "RFQs", "value": self._safe_count("purchase.order", rfq_domain), "type": "number"},
+                        {"label": "Cancelled", "value": self._safe_count("purchase.order", date_domain + [("state", "=", "cancel")]), "type": "number"},
+                    ],
+                    [
+                        {"label": "POs", "value": self._safe_count("purchase.order", po_domain)},
+                        {"label": "RFQs", "value": self._safe_count("purchase.order", rfq_domain)},
+                        {"label": "Cancelled", "value": self._safe_count("purchase.order", date_domain + [("state", "=", "cancel")])},
+                    ],
+                )
+            )
+
+        if self._model_exists("stock.picking"):
+            date_domain = [("create_date", ">=", start), ("create_date", "<=", end)]
+            overviews.append(
+                self._module_payload(
+                    "inventory",
+                    "Inventory",
+                    "fa-cubes",
+                    [
+                        {"label": "Transfers", "value": self._safe_count("stock.picking", date_domain), "type": "number"},
+                        {"label": "Ready", "value": self._safe_count("stock.picking", date_domain + [("state", "=", "assigned")]), "type": "number"},
+                        {"label": "Done", "value": self._safe_count("stock.picking", date_domain + [("state", "=", "done")]), "type": "number"},
+                        {"label": "Waiting", "value": self._safe_count("stock.picking", date_domain + [("state", "in", ("waiting", "confirmed"))]), "type": "number"},
+                    ],
+                    [
+                        {"label": "Ready", "value": self._safe_count("stock.picking", date_domain + [("state", "=", "assigned")])},
+                        {"label": "Done", "value": self._safe_count("stock.picking", date_domain + [("state", "=", "done")])},
+                        {"label": "Waiting", "value": self._safe_count("stock.picking", date_domain + [("state", "in", ("waiting", "confirmed"))])},
+                    ],
+                )
+            )
+
+        if self._model_exists("account.move"):
+            date_domain = [("invoice_date", ">=", start.date()), ("invoice_date", "<=", end.date())]
+            invoice_domain = date_domain + [("move_type", "=", "out_invoice")]
+            bill_domain = date_domain + [("move_type", "=", "in_invoice")]
+            posted_invoice_domain = invoice_domain + [("state", "=", "posted")]
+            overviews.append(
+                self._module_payload(
+                    "accounting",
+                    "Accounting",
+                    "fa-calculator",
+                    [
+                        {"label": "Invoiced", "value": self._safe_sum("account.move", posted_invoice_domain, "amount_total_signed"), "type": "money"},
+                        {"label": "Customer Invoices", "value": self._safe_count("account.move", invoice_domain), "type": "number"},
+                        {"label": "Vendor Bills", "value": self._safe_count("account.move", bill_domain), "type": "number"},
+                        {"label": "Drafts", "value": self._safe_count("account.move", date_domain + [("state", "=", "draft")]), "type": "number"},
+                    ],
+                    [
+                        {"label": "Posted", "value": self._safe_count("account.move", posted_invoice_domain)},
+                        {"label": "Invoices", "value": self._safe_count("account.move", invoice_domain)},
+                        {"label": "Bills", "value": self._safe_count("account.move", bill_domain)},
+                    ],
+                )
+            )
+
+        if self._model_exists("hr.employee"):
+            employee_domain = [("active", "=", True)] if "active" in self.env["hr.employee"]._fields else []
+            overviews.append(
+                self._module_payload(
+                    "employees",
+                    "Employees",
+                    "fa-users",
+                    [
+                        {"label": "Employees", "value": self._safe_count("hr.employee", employee_domain), "type": "number"},
+                        {"label": "New Profiles", "value": self._safe_count("hr.employee", [("create_date", ">=", start), ("create_date", "<=", end)]), "type": "number"},
+                        {"label": "Departments", "value": self._safe_count("hr.department", []), "type": "number"},
+                        {"label": "Jobs", "value": self._safe_count("hr.job", []), "type": "number"},
+                    ],
+                    [
+                        {"label": "Employees", "value": self._safe_count("hr.employee", employee_domain)},
+                        {"label": "Departments", "value": self._safe_count("hr.department", [])},
+                        {"label": "Jobs", "value": self._safe_count("hr.job", [])},
+                    ],
+                )
+            )
+
+        if self._model_exists("project.task"):
+            date_domain = [("create_date", ">=", start), ("create_date", "<=", end)]
+            done_domain = date_domain
+            if "stage_id" in self.env["project.task"]._fields:
+                done_domain += [("stage_id.fold", "=", True)]
+            overviews.append(
+                self._module_payload(
+                    "project",
+                    "Project",
+                    "fa-tasks",
+                    [
+                        {"label": "New Tasks", "value": self._safe_count("project.task", date_domain), "type": "number"},
+                        {"label": "Done", "value": self._safe_count("project.task", done_domain), "type": "number"},
+                        {"label": "Projects", "value": self._safe_count("project.project", []), "type": "number"},
+                        {"label": "Open Tasks", "value": self._safe_count("project.task", [("stage_id.fold", "=", False)]), "type": "number"},
+                    ],
+                    [
+                        {"label": "New", "value": self._safe_count("project.task", date_domain)},
+                        {"label": "Done", "value": self._safe_count("project.task", done_domain)},
+                        {"label": "Open", "value": self._safe_count("project.task", [("stage_id.fold", "=", False)])},
+                    ],
+                )
+            )
+
+        return overviews
+
+    @api.model
+    def get_data(self, tab="all", table_page=1, page_size=8, period_days=30):
         """JSON payload for the Shopall dashboard client action."""
         company = self.env.company
         currency = company.currency_id
-        start, end, prev_start, prev_end = self._period_bounds()
+        period_days = max(1, min(365, int(period_days or 30)))
+        start, end, prev_start, prev_end = self._period_bounds(period_days)
         sale_ok = self._sale_installed()
+        module_overviews = self._get_module_overviews(start, end)
 
         empty = {
             "sale_installed": sale_ok,
             "currency_id": currency.id,
-            "period_days": 30,
+            "period_days": period_days,
+            "module_overviews": module_overviews,
             "metrics": {
                 "revenue": 0.0,
                 "revenue_prev": 0.0,
@@ -218,29 +488,7 @@ class ShopallDashboard(models.TransientModel):
             tab_domain, limit=limit, offset=offset, order="date_order desc"
         )
 
-        rows = []
-        for order in orders:
-            line = order.order_line[:1]
-            product = line.product_id
-            categ_name = product.categ_id.name if product and product.categ_id else ""
-            product_name = product.display_name if product else ""
-            partner = order.partner_id
-            city = partner.city or ""
-            rows.append(
-                {
-                    "id": order.id,
-                    "name": order.name,
-                    "partner_name": partner.display_name or "",
-                    "date_order": fields.Datetime.to_string(order.date_order)
-                    if order.date_order
-                    else "",
-                    "amount_total": order.amount_total,
-                    "category": categ_name,
-                    "product_name": product_name or order.name,
-                    "city": city,
-                    "state": order.state,
-                }
-            )
+        rows = [self._sale_order_row(order) for order in orders]
 
         pending_tab_count = Order.search_count(
             [
@@ -253,7 +501,7 @@ class ShopallDashboard(models.TransientModel):
         return {
             "sale_installed": True,
             "currency_id": currency.id,
-            "period_days": 30,
+            "period_days": period_days,
             "metrics": {
                 "revenue": rev_c,
                 "revenue_prev": rev_p,
@@ -283,6 +531,7 @@ class ShopallDashboard(models.TransientModel):
                 "line_total": line_total_cur,
                 "line_delta_pct": _pct_delta(line_total_cur, line_prev_total),
             },
+            "module_overviews": module_overviews,
             "table": {
                 "rows": rows,
                 "total": total_rows,
@@ -291,4 +540,49 @@ class ShopallDashboard(models.TransientModel):
                 "tab": tab or "all",
             },
             "pending_tab_count": pending_tab_count,
+        }
+
+    @api.model
+    def export_sales(self, tab="all", period_days=30, limit=5000):
+        """Rows for the dashboard CSV export, using the same period/status filters."""
+        if not self._sale_installed():
+            return {"filename": "shopall-sales.csv", "headers": [], "rows": []}
+        period_days = max(1, min(365, int(period_days or 30)))
+        start, end, _prev_start, _prev_end = self._period_bounds(period_days)
+        Order = self.env["sale.order"]
+        Order.check_access("read")
+        domain = self._table_tab_domain(tab, start, end)
+        orders = Order.search(
+            domain,
+            limit=max(1, min(10000, int(limit or 5000))),
+            order="date_order desc",
+        )
+        rows = []
+        for order in orders:
+            row = self._sale_order_row(order)
+            rows.append(
+                [
+                    row["name"],
+                    row["partner_name"],
+                    row["date_order"],
+                    row["amount_total"],
+                    row["category"],
+                    row["product_name"],
+                    row["city"],
+                    row["state"],
+                ]
+            )
+        return {
+            "filename": f"shopall-sales-{tab or 'all'}-{period_days}d.csv",
+            "headers": [
+                "Order",
+                "Client Name",
+                "Date",
+                "Price",
+                "Category",
+                "Product",
+                "City",
+                "Status",
+            ],
+            "rows": rows,
         }

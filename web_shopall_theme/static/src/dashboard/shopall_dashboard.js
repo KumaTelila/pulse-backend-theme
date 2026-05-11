@@ -1,7 +1,6 @@
 /** @odoo-module **/
 
 import { Component, onMounted, onWillStart, onWillUnmount, useRef, useState } from "@odoo/owl";
-import { browser } from "@web/core/browser/browser";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { standardActionServiceProps } from "@web/webclient/actions/action_service";
@@ -24,8 +23,9 @@ export class ShopallDashboard extends Component {
             loading: true,
             data: null,
             tab: "all",
+            moduleTab: "sales",
+            periodDays: 30,
             page: 1,
-            upgradeHidden: browser.localStorage.getItem("shopall_upgrade_banner_dismissed") === "1",
         });
         onWillStart(() => this.load());
         onMounted(() => {
@@ -41,6 +41,7 @@ export class ShopallDashboard extends Component {
                 tab: this.state.tab,
                 table_page: this.state.page,
                 page_size: 8,
+                period_days: this.state.periodDays,
             });
             this.state.data = payload;
         } catch (e) {
@@ -49,6 +50,9 @@ export class ShopallDashboard extends Component {
             this.state.data = null;
         } finally {
             this.state.loading = false;
+        }
+        if (!this.selectedModuleOverview && this.moduleTabs.length) {
+            this.state.moduleTab = this.moduleTabs[0].key;
         }
         this.tryDrawCharts();
     }
@@ -171,6 +175,37 @@ export class ShopallDashboard extends Component {
         return formatFloat(q, { digits: [16, 0] });
     }
 
+    get periodOptions() {
+        return [
+            { days: 7, label: _t("7 days") },
+            { days: 30, label: _t("30 days") },
+            { days: 90, label: _t("90 days") },
+            { days: 365, label: _t("1 year") },
+        ];
+    }
+
+    get moduleTabs() {
+        return this.state.data?.module_overviews || [];
+    }
+
+    get selectedModuleOverview() {
+        return this.moduleTabs.find((module) => module.key === this.state.moduleTab) || null;
+    }
+
+    onModuleTabClick(tabId) {
+        this.state.moduleTab = tabId;
+    }
+
+    formatOverviewValue(metric) {
+        if (!metric) {
+            return "";
+        }
+        if (metric.type === "money") {
+            return this.formatMoney(metric.value || 0);
+        }
+        return this.formatQty(metric.value || 0);
+    }
+
     metricDeltaClass(pct) {
         if (pct == null) {
             return "";
@@ -191,6 +226,15 @@ export class ShopallDashboard extends Component {
             return;
         }
         this.state.tab = tab;
+        this.state.page = 1;
+        await this.load();
+    }
+
+    async onPeriodClick(days) {
+        if (this.state.periodDays === days) {
+            return;
+        }
+        this.state.periodDays = days;
         this.state.page = 1;
         await this.load();
     }
@@ -245,11 +289,6 @@ export class ShopallDashboard extends Component {
         return labels[state] || state;
     }
 
-    dismissUpgrade() {
-        browser.localStorage.setItem("shopall_upgrade_banner_dismissed", "1");
-        this.state.upgradeHidden = true;
-    }
-
     async openSaleOrders() {
         if (!this.state.data?.sale_installed) {
             this.notification.add(_t("Install the Sales app to open orders."), { type: "info" });
@@ -291,8 +330,44 @@ export class ShopallDashboard extends Component {
         return Math.max(1, Math.ceil(t.total / t.page_size));
     }
 
-    onExportClick() {
-        this.openSaleOrders();
+    csvCell(value) {
+        const str = value == null ? "" : String(value);
+        return `"${str.replaceAll('"', '""')}"`;
+    }
+
+    async onExportClick() {
+        if (!this.state.data?.sale_installed) {
+            this.notification.add(_t("Install the Sales app to export sales data."), { type: "info" });
+            return;
+        }
+        try {
+            const payload = await this.orm.call("shopall.dashboard", "export_sales", [], {
+                tab: this.state.tab,
+                period_days: this.state.periodDays,
+            });
+            if (!payload?.rows?.length) {
+                this.notification.add(_t("There is no data to export for this filter."), {
+                    type: "warning",
+                });
+                return;
+            }
+            const lines = [
+                payload.headers.map((cell) => this.csvCell(cell)).join(","),
+                ...payload.rows.map((row) => row.map((cell) => this.csvCell(cell)).join(",")),
+            ];
+            const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = payload.filename || "shopall-sales.csv";
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (e) {
+            console.error(e);
+            this.notification.add(_t("Could not export sales data."), { type: "danger" });
+        }
     }
 }
 

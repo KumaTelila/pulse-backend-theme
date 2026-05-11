@@ -46,12 +46,7 @@ patch(NavBar.prototype, {
 
     onShopallHistoryBack(ev) {
         ev.preventDefault();
-        const ctrl = this.actionService.currentController;
-        if (ctrl?.config?.historyBack) {
-            ctrl.config.historyBack();
-        } else {
-            browser.history.back();
-        }
+        browser.history.back();
     },
 
     onShopallHistoryForward(ev) {

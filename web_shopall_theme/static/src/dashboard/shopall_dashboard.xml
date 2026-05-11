@@ -6,28 +6,22 @@
                 <div t-if="state.loading" class="o_shopall_dash_refresh position-absolute top-0 end-0 p-2" style="z-index: 2;">
                     <i class="fa fa-spinner fa-spin text-primary" aria-hidden="true" title="Loading"/>
                 </div>
-                <div t-if="!state.upgradeHidden" class="o_shopall_dash_upgrade d-flex align-items-center gap-3 mb-4 rounded text-white">
-                    <i class="fa fa-unlock-alt" aria-hidden="true"/>
-                    <p class="mb-0 flex-grow-1 small opacity-75">
-                        Unlock premium features — Upgrade to Pro for unlimited analytics and real-time insights.
-                    </p>
-                    <div class="d-flex gap-2">
-                        <a href="https://www.odoo.com/pricing" target="_blank" rel="noreferrer" class="btn btn-sm btn-light fw-bold">
-                            Upgrade Now
-                        </a>
-                        <button type="button" class="btn btn-sm btn-outline-light" t-on-click="() => this.dismissUpgrade()">
-                            Dismiss
-                        </button>
-                    </div>
-                </div>
-
                 <div class="o_shopall_dash_section_head d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
                     <span class="o_shopall_dash_section_title">Overview</span>
                     <div class="d-flex align-items-center gap-2 flex-wrap">
-                        <span class="o_shopall_dash_badge o_shopall_dash_muted d-flex align-items-center gap-1">
-                            <i class="fa fa-calendar" aria-hidden="true"/>
-                            <t t-esc="state.data?.period_days || 30"/> days
-                        </span>
+                        <div class="o_shopall_dash_period_filter d-flex align-items-center flex-wrap">
+                            <button
+                                t-foreach="periodOptions"
+                                t-as="option"
+                                t-key="option.days"
+                                type="button"
+                                class="o_shopall_dash_period_btn"
+                                t-att-class="{ active: state.periodDays === option.days }"
+                                t-on-click="() => this.onPeriodClick(option.days)"
+                            >
+                                <t t-esc="option.label"/>
+                            </button>
+                        </div>
                         <span class="o_shopall_dash_badge o_shopall_dash_muted d-flex align-items-center gap-1">
                             <i class="fa fa-clock-o" aria-hidden="true"/>
                             Last <t t-esc="state.data?.period_days || 30"/> days
@@ -41,6 +35,69 @@
 
                 <div t-if="!state.data?.sale_installed" class="alert alert-info">
                     Install the <strong>Sales</strong> app to see live revenue, orders, and charts. Metrics stay at zero until then.
+                </div>
+
+                <div class="o_shopall_dash_modules mb-4">
+                    <div class="o_shopall_dash_modules_head d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <div>
+                            <div class="o_shopall_dash_section_title">Business Pulse</div>
+                            <div class="o_shopall_dash_modules_sub text-muted">Your key apps, live numbers, and trends at a glance.</div>
+                        </div>
+                        <span class="o_shopall_dash_badge o_shopall_dash_muted">
+                            <i class="fa fa-clock-o" aria-hidden="true"/>
+                            Last <t t-esc="state.data?.period_days || 30"/> days
+                        </span>
+                    </div>
+                    <div class="o_shopall_dash_module_tabs d-flex flex-wrap">
+                        <button
+                            t-foreach="moduleTabs"
+                            t-as="module"
+                            t-key="module.key"
+                            type="button"
+                            class="o_shopall_dash_module_tab"
+                            t-att-class="{ active: state.moduleTab === module.key }"
+                            t-on-click="() => this.onModuleTabClick(module.key)"
+                        >
+                            <i t-att-class="'fa ' + module.icon" aria-hidden="true"/>
+                            <t t-esc="module.label"/>
+                        </button>
+                    </div>
+                    <div t-if="selectedModuleOverview" class="o_shopall_dash_module_panel">
+                        <div class="o_shopall_dash_module_kpis">
+                            <div
+                                t-foreach="selectedModuleOverview.metrics"
+                                t-as="metric"
+                                t-key="metric.label"
+                                class="o_shopall_dash_module_kpi"
+                            >
+                                <div class="o_shopall_dash_module_kpi_label" t-esc="metric.label"/>
+                                <div class="o_shopall_dash_module_kpi_value" t-esc="formatOverviewValue(metric)"/>
+                            </div>
+                        </div>
+                        <div class="o_shopall_dash_module_visual">
+                            <div class="o_shopall_dash_module_visual_title">
+                                <i t-att-class="'fa ' + selectedModuleOverview.icon" aria-hidden="true"/>
+                                <t t-esc="selectedModuleOverview.label"/> breakdown
+                            </div>
+                            <div
+                                t-foreach="selectedModuleOverview.bars"
+                                t-as="bar"
+                                t-key="bar.label"
+                                class="o_shopall_dash_module_bar_row"
+                            >
+                                <div class="o_shopall_dash_module_bar_label">
+                                    <span t-esc="bar.label"/>
+                                    <strong t-esc="formatQty(bar.value || 0)"/>
+                                </div>
+                                <div class="o_shopall_dash_module_bar_track">
+                                    <span class="o_shopall_dash_module_bar_fill" t-attf-style="width: {{ bar.percent }}%"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div t-if="!moduleTabs.length" class="o_shopall_dash_module_empty text-muted">
+                        No readable module data is available for this user.
+                    </div>
                 </div>
 
                 <div class="o_shopall_dash_metrics row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3 mb-4">
