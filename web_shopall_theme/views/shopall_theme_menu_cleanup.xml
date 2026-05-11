@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Drop standalone Settings entry; theme lives only under General Settings (like Sales). -->
+    <delete model="ir.ui.menu" id="menu_shopall_theme_settings"/>
+    <delete model="ir.actions.act_window" id="action_shopall_theme_configuration"/>
+</odoo>

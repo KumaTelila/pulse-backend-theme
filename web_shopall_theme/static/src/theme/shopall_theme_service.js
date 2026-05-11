@@ -2,6 +2,7 @@
 
 import { browser } from "@web/core/browser/browser";
 import { registry } from "@web/core/registry";
+import { session } from "@web/session";
 
 const STORAGE_KEY = "web_shopall_theme.primary";
 
@@ -13,7 +14,7 @@ function normalizeHex(hex) {
     if (h.length === 4) {
         h = `#${h[1]}${h[1]}${h[2]}${h[2]}${h[3]}${h[3]}`;
     }
-    return /^#[0-9a-fA-F]{6}$/.test(h) ? h : null;
+    return /^#[0-9a-fA-F]{6}$/.test(h) ? h.toLowerCase() : null;
 }
 
 function mixChannel(a, b, ratio) {
@@ -41,6 +42,36 @@ function mixWithWhiteBlack(hex, toward) {
     return `#${((1 << 24) + (nr << 16) + (ng << 8) + nb).toString(16).slice(1)}`;
 }
 
+/**
+ * Apply design tokens that mirror odoo_dashboard_theme.html :root (text, muted, bg, border).
+ * @param {Record<string, string|undefined>} theme from session_info.shopall_theme
+ */
+function applySemanticTokens(theme) {
+    if (!theme) {
+        return;
+    }
+    const root = document.documentElement;
+    const pairs = [
+        ["text", "--shopall-text"],
+        ["muted", "--shopall-muted"],
+        ["canvas", "--shopall-canvas"],
+        ["border", "--shopall-border"],
+    ];
+    for (const [key, prop] of pairs) {
+        const h = normalizeHex(theme[key]);
+        if (h) {
+            root.style.setProperty(prop, h);
+        }
+    }
+}
+
+function clearSemanticTokenOverrides() {
+    const root = document.documentElement;
+    for (const prop of ["--shopall-text", "--shopall-muted", "--shopall-canvas", "--shopall-border"]) {
+        root.style.removeProperty(prop);
+    }
+}
+
 export const SHOPALL_THEME_PRESETS = [
     { id: "violet", label: "Shopall", color: "#5b4fec" },
     { id: "indigo", label: "Indigo", color: "#4f46e5" },
@@ -54,10 +85,11 @@ export const shopallThemeService = {
     dependencies: [],
     start() {
         /**
-         * Apply accent color and derived tokens to :root (Bootstrap/Odoo primary follows via shopall_dynamic.scss).
+         * Apply accent and derived --shopall-primary-* (see shopall_dynamic.scss).
          * @param {string} hex
+         * @param {{ persistUserOverride?: boolean }} [opts] if true, remember in localStorage (systray)
          */
-        function applyPrimary(hex) {
+        function applyPrimary(hex, { persistUserOverride = true } = {}) {
             const base = normalizeHex(hex);
             if (!base) {
                 return;
@@ -68,19 +100,37 @@ export const shopallThemeService = {
             const light = mixWithWhiteBlack(base, 0.88) || "#ede9fd";
             root.style.setProperty("--shopall-primary-dark", dark);
             root.style.setProperty("--shopall-primary-light", light);
-            browser.localStorage.setItem(STORAGE_KEY, base);
+            if (persistUserOverride) {
+                browser.localStorage.setItem(STORAGE_KEY, base);
+            }
+        }
+
+        function applyServerTheme(theme) {
+            if (!theme) {
+                return;
+            }
+            if (theme.primary) {
+                applyPrimary(theme.primary, { persistUserOverride: false });
+            }
+            applySemanticTokens(theme);
         }
 
         function resetPrimary() {
+            browser.localStorage.removeItem(STORAGE_KEY);
             document.documentElement.style.removeProperty("--shopall-primary");
             document.documentElement.style.removeProperty("--shopall-primary-dark");
             document.documentElement.style.removeProperty("--shopall-primary-light");
-            browser.localStorage.removeItem(STORAGE_KEY);
+            clearSemanticTokenOverrides();
+            applyServerTheme(session.shopall_theme);
         }
 
+        const serverTheme = session.shopall_theme;
+        if (serverTheme) {
+            applyServerTheme(serverTheme);
+        }
         const stored = browser.localStorage.getItem(STORAGE_KEY);
         if (stored && normalizeHex(stored)) {
-            applyPrimary(stored);
+            applyPrimary(stored, { persistUserOverride: true });
         }
 
         return {

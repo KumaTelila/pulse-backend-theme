@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     "name": "Shopall Backend Theme",
-    "version": "19.0.1.0.1",
+    "version": "19.0.1.0.4",
     "category": "Theme/Backend",
     "summary": "Dashboard-style backend shell: sidebar apps, two-row navbar, accent colors",
     "depends": ["web", "mail"],
@@ -11,6 +11,8 @@
     "auto_install": False,
     "data": [
         "security/ir.model.access.csv",
+        "views/shopall_theme_menu_cleanup.xml",
+        "views/shopall_theme_settings_views.xml",
         "views/shopall_dashboard_action.xml",
     ],
     "assets": {

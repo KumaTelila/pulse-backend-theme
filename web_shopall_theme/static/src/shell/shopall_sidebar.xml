@@ -1,106 +1,161 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="web_shopall_theme.ShopallSidebar">
-        <aside class="o_shopall_sidebar d-none d-lg-flex flex-column flex-shrink-0 h-100 bg-white border-end">
-            <div class="o_shopall_sidebar_brand d-flex align-items-center gap-2 px-3 py-3 border-bottom">
-                <t t-if="companyName">
-                    <img
-                        t-if="companyLogoUrl"
-                        class="o_shopall_sidebar_brand_logo rounded flex-shrink-0"
-                        t-att-src="companyLogoUrl"
-                        alt=""
-                        t-on-error="onCompanyHeaderLogoError"
+        <aside
+            class="o_shopall_sidebar d-none d-lg-flex flex-column flex-shrink-0 h-100 bg-white border-end"
+            t-att-class="{ o_shopall_sidebar_narrow: state.sidebarNarrow }"
+        >
+            <div class="o_shopall_sidebar_brand_row d-flex align-items-stretch">
+                <button
+                    type="button"
+                    class="o_shopall_sidebar_brand d-flex align-items-center gap-2 px-3 py-3 flex-grow-1 rounded-0 bg-white text-start border-0 shadow-none min-w-0"
+                    t-att-class="{ o_shopall_sidebar_brand_active: isDashboardActive() }"
+                    title="Overview"
+                    t-on-click="(ev) => this.onDashboardClick(ev)"
+                >
+                    <t t-if="companyName">
+                        <img
+                            t-if="companyLogoUrl"
+                            class="o_shopall_sidebar_brand_logo rounded flex-shrink-0"
+                            t-att-src="companyLogoUrl"
+                            alt=""
+                            t-on-error="onCompanyHeaderLogoError"
+                        />
+                        <div
+                            t-else=""
+                            class="o_shopall_sidebar_logo rounded d-flex align-items-center justify-content-center text-white fw-bold flex-shrink-0"
+                            t-esc="companyInitial"
+                        />
+                        <span class="o_shopall_sidebar_label fw-bold text-primary fs-6 mb-0 text-truncate" t-esc="companyName"/>
+                    </t>
+                    <t t-else="">
+                        <div class="o_shopall_sidebar_logo rounded d-flex align-items-center justify-content-center text-white fw-bold">
+                            <i class="fa fa-shopping-bag" title="Apps" aria-hidden="true"/>
+                        </div>
+                        <span class="o_shopall_sidebar_label fw-bold text-primary fs-6 mb-0">Shopall</span>
+                    </t>
+                </button>
+                <button
+                    type="button"
+                    class="o_shopall_sidebar_toggle d-flex align-items-center justify-content-center border-0 bg-white flex-shrink-0 shadow-none"
+                    t-att-title="state.sidebarNarrow ? 'Expand sidebar' : 'Collapse sidebar'"
+                    t-on-click="toggleSidebarNarrow"
+                    t-att-aria-pressed="state.sidebarNarrow ? 'true' : 'false'"
+                >
+                    <i
+                        aria-hidden="true"
+                        t-attf-class="fa fa-lg text-muted {{ state.sidebarNarrow ? 'fa-angle-double-right' : 'fa-angle-double-left' }}"
                     />
-                    <div
-                        t-else=""
-                        class="o_shopall_sidebar_logo rounded d-flex align-items-center justify-content-center text-white fw-bold flex-shrink-0"
-                        t-esc="companyInitial"
-                    />
-                    <span class="fw-bold text-primary fs-6 mb-0 text-truncate" t-esc="companyName"/>
-                </t>
-                <t t-else="">
-                    <div class="o_shopall_sidebar_logo rounded d-flex align-items-center justify-content-center text-white fw-bold">
-                        <i class="fa fa-shopping-bag" title="Apps" aria-hidden="true"/>
-                    </div>
-                    <span class="fw-bold text-primary fs-6 mb-0">Shopall</span>
-                </t>
+                </button>
             </div>
+
+            <div class="o_shopall_sidebar_header_sep" role="presentation"/>
 
             <nav class="o_shopall_sidebar_nav flex-grow-1 overflow-auto py-2 min-w-0">
                 <a
                     href="#"
                     class="o_shopall_sidebar_item d-flex align-items-center gap-2 rounded text-decoration-none"
                     t-att-class="{ o_shopall_sidebar_item_active: isDashboardActive() }"
+                    title="Overview"
                     t-on-click="(ev) => this.onDashboardClick(ev)"
                 >
                     <i class="fa fa-th-large" aria-hidden="true"/>
-                    <span>Dashboard</span>
+                    <span class="o_shopall_sidebar_label">Overview</span>
                 </a>
 
                 <t t-foreach="apps" t-as="app" t-key="app.id">
                     <div class="o_shopall_sidebar_app_block">
-                        <div
-                            class="o_shopall_nav_parent d-flex align-items-center gap-2 rounded"
-                            t-att-class="{
-                                collapsed: !isAppExpanded(app),
-                                active: isAppActive(app),
-                            }"
-                            role="button"
-                            tabindex="0"
-                            t-on-click="(ev) => this.toggleApp(app, ev)"
-                        >
-                            <img
-                                t-if="app.webIconData"
-                                class="o_shopall_nav_parent_icon rounded"
-                                t-att-src="app.webIconData"
-                                alt=""
-                            />
-                            <i t-else="" class="fa fa-folder-o o_shopall_nav_parent_icon_fa text-muted" aria-hidden="true"/>
-                            <span class="text-truncate fw-semibold flex-grow-1" t-esc="app.name"/>
-                            <i class="fa fa-chevron-up o_shopall_nav_chevron small" aria-hidden="true"/>
-                        </div>
-                        <div
-                            class="o_shopall_nav_children"
-                            t-att-class="{'collapsed': !isAppExpanded(app)}"
-                        >
-                            <t t-call="web_shopall_theme.ShopallSidebar.MenuBranch">
-                                <t t-set="menus" t-value="appTree(app).childrenTree"/>
-                                <t t-set="level" t-value="1"/>
+                        <!-- Collapsed rail: mega menu opens a flyout with full labels + tree -->
+                        <t t-if="state.sidebarNarrow">
+                            <t t-if="hasAppTreeChildren(app)">
+                                <Dropdown position="'right-start'" bottomSheet="false" menuClass="'o_shopall_sidebar_flyout_menu'">
+                                    <button
+                                        type="button"
+                                        class="o_shopall_nav_parent o_shopall_nav_parent_narrow_toggle d-flex align-items-center gap-2 rounded border-0 bg-transparent w-100 text-start"
+                                        t-att-class="{ active: isAppActive(app) }"
+                                        t-att-title="app.name"
+                                        t-att-aria-label="app.name"
+                                    >
+                                        <img
+                                            t-if="app.webIconData"
+                                            class="o_shopall_nav_parent_icon rounded flex-shrink-0"
+                                            t-att-src="app.webIconData"
+                                            alt=""
+                                        />
+                                        <i t-else="" class="fa fa-folder-o o_shopall_nav_parent_icon_fa text-muted flex-shrink-0" aria-hidden="true"/>
+                                    </button>
+                                    <t t-set-slot="content">
+                                        <ShopallSidebarNarrowFlyoutMenu t-props="narrowFlyoutMenuProps(app)"/>
+                                    </t>
+                                </Dropdown>
                             </t>
-                        </div>
+                            <t t-else="">
+                                <button
+                                    type="button"
+                                    class="o_shopall_nav_parent o_shopall_nav_parent_narrow_toggle d-flex align-items-center gap-2 rounded border-0 bg-transparent w-100 text-start"
+                                    t-att-class="{ active: isAppActive(app) }"
+                                    t-att-title="app.name"
+                                    t-att-aria-label="app.name"
+                                    t-on-click="(ev) => this.onNarrowAppWithoutChildren(app, ev)"
+                                >
+                                    <img
+                                        t-if="app.webIconData"
+                                        class="o_shopall_nav_parent_icon rounded flex-shrink-0"
+                                        t-att-src="app.webIconData"
+                                        alt=""
+                                    />
+                                    <i t-else="" class="fa fa-folder-o o_shopall_nav_parent_icon_fa text-muted flex-shrink-0" aria-hidden="true"/>
+                                </button>
+                            </t>
+                        </t>
+                        <t t-else="">
+                            <div
+                                class="o_shopall_nav_parent d-flex align-items-center gap-2 rounded"
+                                t-att-class="{
+                                    collapsed: !isAppExpanded(app),
+                                    active: isAppActive(app),
+                                }"
+                                role="button"
+                                tabindex="0"
+                                t-on-click="(ev) => this.toggleApp(app, ev)"
+                            >
+                                <img
+                                    t-if="app.webIconData"
+                                    class="o_shopall_nav_parent_icon rounded"
+                                    t-att-src="app.webIconData"
+                                    alt=""
+                                />
+                                <i t-else="" class="fa fa-folder-o o_shopall_nav_parent_icon_fa text-muted" aria-hidden="true"/>
+                                <span class="o_shopall_sidebar_label text-truncate fw-semibold flex-grow-1" t-esc="app.name"/>
+                                <i class="fa fa-chevron-up o_shopall_nav_chevron small" aria-hidden="true"/>
+                            </div>
+                            <div
+                                class="o_shopall_nav_children"
+                                t-att-class="{'collapsed': !isAppExpanded(app)}"
+                            >
+                                <t t-call="web_shopall_theme.ShopallSidebar.MenuBranch">
+                                    <t t-set="menus" t-value="appTree(app).childrenTree"/>
+                                    <t t-set="level" t-value="1"/>
+                                </t>
+                            </div>
+                        </t>
                     </div>
                 </t>
             </nav>
 
             <!-- Bottom profile block (fixed under scroll area, matches design HTML). -->
             <div class="o_shopall_sidebar_bottom flex-shrink-0">
-                <div class="o_shopall_sidebar_profile_label">
+                <div class="o_shopall_sidebar_profile_label o_shopall_sidebar_label">
                     Profile
                 </div>
                 <a
-                    t-if="discussMenu"
                     href="#"
                     class="o_shopall_sidebar_footer_item"
-                    t-on-click="(ev) => this.onDiscussClick(ev)"
-                >
-                    <i class="fa fa-comments-o" aria-hidden="true"/>
-                    <span>Discuss</span>
-                </a>
-                <a
-                    href="#"
-                    class="o_shopall_sidebar_footer_item"
-                    t-on-click="(ev) => this.onPreferencesClick(ev)"
-                >
-                    <i class="fa fa-cog" aria-hidden="true"/>
-                    <span>Settings</span>
-                </a>
-                <a
-                    href="#"
-                    class="o_shopall_sidebar_footer_item"
+                    title="Log out"
                     t-on-click="(ev) => this.onLogoutClick(ev)"
                 >
                     <i class="fa fa-sign-out" aria-hidden="true"/>
-                    <span>Log out</span>
+                    <span class="o_shopall_sidebar_label">Log out</span>
                 </a>
                 <div class="o_shopall_sidebar_footer">
                     <button
@@ -119,7 +174,7 @@
                             class="o_shopall_sidebar_user_avatar rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
                             t-esc="userInitials"
                         />
-                        <div class="o_shopall_sidebar_user_info">
+                        <div class="o_shopall_sidebar_user_info o_shopall_sidebar_label">
                             <div class="o_shopall_sidebar_user_name text-truncate" t-esc="userName"/>
                             <div class="o_shopall_sidebar_user_email text-truncate" t-esc="userEmail"/>
                         </div>
@@ -127,6 +182,68 @@
                 </div>
             </div>
         </aside>
+    </t>
+
+    <t t-name="web_shopall_theme.ShopallSidebarNarrowFlyoutMenu">
+        <div class="o_shopall_sidebar_flyout_panel">
+            <div
+                class="o_shopall_sidebar_flyout_title px-3 py-2 fw-semibold small text-muted border-bottom"
+                t-esc="props.app.name"
+            />
+            <div class="o_shopall_sidebar_flyout_body py-1">
+                <t t-call="web_shopall_theme.ShopallSidebarNarrowFlyoutMenuBranch">
+                    <t t-set="menus" t-value="menuTreeChildren"/>
+                    <t t-set="level" t-value="1"/>
+                </t>
+            </div>
+        </div>
+    </t>
+
+    <!-- Same tree as MenuBranch; leaf clicks close the narrow flyout dropdown. -->
+    <t t-name="web_shopall_theme.ShopallSidebarNarrowFlyoutMenuBranch">
+        <t t-foreach="menus" t-as="menu" t-key="menu.id">
+            <t t-if="hasMenuBranches(menu)">
+                <div class="o_shopall_nav_folder">
+                    <div
+                        class="o_shopall_nav_sub_parent d-flex align-items-center justify-content-between rounded"
+                        t-attf-class="o_shopall_nav_level_{{level}}"
+                        t-att-class="{ collapsed: !isNodeExpanded(menu) }"
+                        t-att-style="subFolderRowStyle(level)"
+                        role="button"
+                        tabindex="0"
+                        t-on-click="(ev) => this.toggleNode(menu, ev)"
+                    >
+                        <span class="o_shopall_sidebar_label text-truncate fw-semibold" t-esc="menu.name"/>
+                        <i class="fa fa-chevron-up o_shopall_nav_chevron small ms-1 flex-shrink-0" aria-hidden="true"/>
+                    </div>
+                    <div
+                        class="o_shopall_nav_children"
+                        t-att-class="{
+                            collapsed: !isNodeExpanded(menu),
+                            o_shopall_nav_nested: true,
+                        }"
+                    >
+                        <t t-call="web_shopall_theme.ShopallSidebarNarrowFlyoutMenuBranch">
+                            <t t-set="menus" t-value="menu.childrenTree"/>
+                            <t t-set="level" t-value="level + 1"/>
+                        </t>
+                    </div>
+                </div>
+            </t>
+            <t t-if="!hasMenuBranches(menu)">
+                <a
+                    href="#"
+                    class="o_shopall_nav_leaf d-flex align-items-center gap-2 rounded text-decoration-none"
+                    t-attf-class="o_shopall_nav_level_{{level}}"
+                    t-att-class="{'active': isLeafActive(menu)}"
+                    t-att-style="leafRowStyle(level)"
+                    t-att-href="getMenuItemHref(menu)"
+                    t-on-click="(ev) => this.onMenuLeafClickInFlyout(menu, ev)"
+                >
+                    <span class="o_shopall_sidebar_label text-truncate flex-grow-1" t-esc="menu.name"/>
+                </a>
+            </t>
+        </t>
     </t>
 
     <!-- Recursive branch: mirrors nav-sub-parent / nav-leaf from the HTML design. -->
@@ -143,7 +260,7 @@
                         tabindex="0"
                         t-on-click="(ev) => this.toggleNode(menu, ev)"
                     >
-                        <span class="text-truncate fw-semibold" t-esc="menu.name"/>
+                        <span class="o_shopall_sidebar_label text-truncate fw-semibold" t-esc="menu.name"/>
                         <i class="fa fa-chevron-up o_shopall_nav_chevron small ms-1 flex-shrink-0" aria-hidden="true"/>
                     </div>
                     <div
@@ -170,7 +287,7 @@
                     t-att-href="getMenuItemHref(menu)"
                     t-on-click="(ev) => this.onMenuLeafClick(menu, ev)"
                 >
-                    <span class="text-truncate flex-grow-1" t-esc="menu.name"/>
+                    <span class="o_shopall_sidebar_label text-truncate flex-grow-1" t-esc="menu.name"/>
                 </a>
             </t>
         </t>

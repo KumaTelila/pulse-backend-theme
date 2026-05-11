@@ -69,10 +69,143 @@ body.o_shopall_theme.o_web_client > .o_shopall_shell {
     min-width: var(--shopall-sidebar-width, 220px);
     min-height: 0;
     z-index: 2;
+    transition: width 0.2s ease, min-width 0.2s ease;
+}
+
+body.o_shopall_theme.o_shopall_sidebar_collapsed {
+    --shopall-sidebar-width: 72px;
+}
+
+.o_shopall_sidebar_brand_row {
+    min-height: 52px;
+    background: #fff;
+}
+
+.o_shopall_sidebar_header_sep {
+    flex-shrink: 0;
+    height: 1px;
+    margin: 0 12px;
+    background: var(--shopall-border, #eaecf0);
+}
+
+.o_shopall_sidebar_toggle {
+    width: 42px;
+    min-width: 42px;
+    cursor: pointer;
+    color: var(--shopall-muted, #6b7280);
+    transition: background-color 0.15s ease, color 0.15s ease;
+    box-shadow: none;
+
+    &:hover {
+        background-color: var(--shopall-canvas, #f4f5f7);
+        color: var(--shopall-primary, #5b4fec);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--shopall-primary, #5b4fec);
+        outline-offset: -2px;
+        z-index: 1;
+    }
+}
+
+.o_shopall_sidebar_narrow {
+    .o_shopall_sidebar_header_sep {
+        margin-left: 8px;
+        margin-right: 8px;
+    }
+
+    .o_shopall_sidebar_label {
+        display: none !important;
+    }
+
+    .o_shopall_nav_chevron {
+        display: none !important;
+    }
+
+    // Mega-menu flyout lives in an overlay; keep app triggers full-width on the rail.
+    .o_shopall_sidebar_app_block .o-dropdown {
+        display: block;
+        width: 100%;
+    }
+
+    .o_shopall_sidebar_brand {
+        justify-content: center;
+        padding-left: 0.35rem !important;
+        padding-right: 0.35rem !important;
+
+        .o_shopall_sidebar_brand_logo,
+        .o_shopall_sidebar_logo {
+            margin: 0;
+        }
+    }
+
+    .o_shopall_sidebar_item,
+    .o_shopall_nav_parent,
+    .o_shopall_nav_parent_narrow_toggle {
+        justify-content: center;
+        gap: 0 !important;
+    }
+
+    .o_shopall_nav_sub_parent,
+    .o_shopall_nav_leaf {
+        justify-content: center !important;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    .o_shopall_sidebar_footer_item {
+        justify-content: center;
+    }
+
+    .o_shopall_sidebar_user_card {
+        justify-content: center;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+}
+
+// Narrow sidebar: Odoo Dropdown popover for app submenu (labels visible; not under .o_shopall_sidebar_narrow).
+.o_shopall_sidebar_flyout_menu {
+    min-width: 240px;
+    max-width: #{"min(320px, 85vw)"};
+    max-height: #{"min(70vh, 520px)"};
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+
+    .o_shopall_sidebar_label {
+        display: block !important;
+    }
+
+    .o_shopall_nav_chevron {
+        display: inline-block !important;
+    }
+}
+
+.o_shopall_sidebar_flyout_panel {
+    min-width: 220px;
 }
 
 .o_shopall_sidebar_brand {
     min-height: 52px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: none;
+
+    &:hover {
+        background-color: var(--shopall-canvas, #f4f5f7);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--shopall-primary, #5b4fec);
+        outline-offset: -2px;
+    }
+
+    &.o_shopall_sidebar_brand_active {
+        background-color: var(--shopall-primary-light, #ede9fd);
+    }
 }
 
 .o_shopall_sidebar_logo {
@@ -335,22 +468,24 @@ body.o_shopall_theme.o_web_client > .o_shopall_shell {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
-// App name (e.g. Discuss): label hides on hover/focus of the brand control.
-@media (hover: hover) and (min-width: 992px) {
-    body.o_shopall_theme .o_shopall_menu_brand .o_shopall_menu_brand_label {
-        display: inline-block;
-        max-width: 280px;
-        transition: opacity 0.12s ease, max-width 0.18s ease, margin 0.18s ease;
-        vertical-align: bottom;
-    }
+.o_shopall_navbar_route {
+    // Pass through to CSS min(); Sass cannot mix px + vw at compile time.
+    max-width: #{"min(440px, 38vw)"};
+}
 
-    body.o_shopall_theme .o_shopall_menu_brand:hover .o_shopall_menu_brand_label,
-    body.o_shopall_theme .o_shopall_menu_brand:focus-visible .o_shopall_menu_brand_label {
-        opacity: 0;
-        max-width: 0;
-        margin: 0 !important;
-        overflow: hidden;
-    }
+.o_shopall_navbar_history {
+    flex-shrink: 0;
+}
+
+.o_shopall_navbar_hist_btn {
+    line-height: 1.2;
+    background: #fff !important;
+}
+
+.o_shopall_navbar_crumb .btn-link {
+    font-size: inherit;
+    line-height: inherit;
+    vertical-align: baseline;
 }
 
 // Icon-only company control: compact, centered.

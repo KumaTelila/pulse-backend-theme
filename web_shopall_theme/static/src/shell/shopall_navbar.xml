@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
-    <!-- Single top row: apps, brand, search, systray (section tabs live in sidebar). -->
+    <!-- Single top row: apps, route, search, systray (app names live in sidebar + breadcrumbs). -->
     <t t-inherit="web.NavBar" t-inherit-mode="extension">
         <xpath expr="//header[contains(@class, 'o_navbar')]" position="replace">
             <header class="o_navbar o_shopall_navbar_header" t-ref="root">
@@ -12,14 +12,48 @@
                         <t t-set="apps" t-value="menuService.getApps()"/>
                     </t>
 
-                    <DropdownItem
-                        t-if="!this.ui.isSmall and currentApp"
-                        class="'o_menu_brand d-flex o_shopall_menu_brand align-items-center'"
-                        onSelected="() => this.onNavBarDropdownItemSelection(currentApp)"
-                        attrs="{ href: getMenuItemHref(currentApp), 'data-menu-xmlid': currentApp.xmlid, 'data-section': currentApp.id }"
+                    <div
+                        t-if="shopallRouteSegments.length"
+                        class="o_shopall_navbar_route d-flex align-items-center gap-2 flex-shrink-0 min-w-0 ms-1 d-none d-md-flex"
                     >
-                        <span class="o_shopall_menu_brand_label text-truncate" t-esc="currentApp.name"/>
-                    </DropdownItem>
+                        <div class="btn-group o_shopall_navbar_history shadow-sm" role="group" aria-label="History">
+                            <button
+                                type="button"
+                                class="btn btn-light border o_shopall_navbar_hist_btn py-1 px-2"
+                                title="Back"
+                                t-on-click="onShopallHistoryBack"
+                            >
+                                <i class="fa fa-chevron-left small" aria-hidden="true"/>
+                            </button>
+                            <button
+                                type="button"
+                                class="btn btn-light border o_shopall_navbar_hist_btn py-1 px-2"
+                                title="Forward"
+                                t-on-click="onShopallHistoryForward"
+                            >
+                                <i class="fa fa-chevron-right small" aria-hidden="true"/>
+                            </button>
+                        </div>
+                        <div class="o_shopall_navbar_crumb text-truncate small lh-sm">
+                            <t t-foreach="shopallRouteSegments" t-as="seg" t-key="seg.jsId">
+                                <t t-if="seg_index > 0">
+                                    <span class="text-muted"> / </span>
+                                </t>
+                                <t t-if="seg.isLast">
+                                    <span class="fw-bold text-dark" t-esc="seg.name"/>
+                                </t>
+                                <t t-else="">
+                                    <button
+                                        type="button"
+                                        class="btn btn-link btn-sm p-0 align-baseline text-muted text-decoration-none"
+                                        t-on-click="(ev) => this.onShopallCrumbClick(seg, ev)"
+                                    >
+                                        <t t-esc="seg.name"/>
+                                    </button>
+                                </t>
+                            </t>
+                        </div>
+                    </div>
 
                     <div class="o_shopall_topbar_search flex-grow-1 px-2 d-none d-md-flex justify-content-center">
                         <button
