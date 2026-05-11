@@ -8,8 +8,25 @@ import { useDropdownCloser } from "@web/core/dropdown/dropdown_hooks";
 import { useBus, useService } from "@web/core/utils/hooks";
 import { user, userBus } from "@web/core/user";
 import { imageUrl } from "@web/core/utils/urls";
+import { session } from "@web/session";
 
 const SIDEBAR_NARROW_KEY = "web_shopall_theme.sidebar_narrow";
+const DEFAULT_APP_ICON = "fa-folder-o";
+const THEME_APP_ICONS = [
+    { match: ["sales", "sale"], icon: "fa-shopping-bag" },
+    { match: ["crm"], icon: "fa-handshake-o" },
+    { match: ["purchase"], icon: "fa-credit-card" },
+    { match: ["inventory", "stock", "warehouse"], icon: "fa-cubes" },
+    { match: ["invoice", "invoicing", "accounting", "account"], icon: "fa-calculator" },
+    { match: ["employee", "hr"], icon: "fa-users" },
+    { match: ["point of sale", "pos"], icon: "fa-shopping-cart" },
+    { match: ["project"], icon: "fa-tasks" },
+    { match: ["discuss", "mail"], icon: "fa-comments-o" },
+    { match: ["website"], icon: "fa-globe" },
+    { match: ["calendar"], icon: "fa-calendar" },
+    { match: ["contacts"], icon: "fa-address-book-o" },
+    { match: ["apps", "settings"], icon: "fa-cog" },
+];
 
 /**
  * Flyout body for collapsed sidebar: same tree as MenuBranch but closes the parent
@@ -126,6 +143,30 @@ export class ShopallSidebar extends Component {
 
     get apps() {
         return this.menuService.getApps();
+    }
+
+    get appIconStyle() {
+        return session.shopall_theme?.app_icon_style || "shopall";
+    }
+
+    shouldUseOdooAppIcon(app) {
+        return this.appIconStyle === "odoo" && !!app.webIconData;
+    }
+
+    appThemeIconClass(app) {
+        const haystack = [
+            app.name,
+            app.xmlid,
+            app.actionPath,
+            app.appID,
+        ]
+            .filter(Boolean)
+            .join(" ")
+            .toLowerCase();
+        const found = THEME_APP_ICONS.find(({ match }) =>
+            match.some((token) => haystack.includes(token))
+        );
+        return `fa ${found?.icon || DEFAULT_APP_ICON}`;
     }
 
     get companyName() {

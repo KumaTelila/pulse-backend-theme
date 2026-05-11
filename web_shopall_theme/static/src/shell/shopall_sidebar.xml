@@ -77,12 +77,12 @@
                                         t-att-aria-label="app.name"
                                     >
                                         <img
-                                            t-if="app.webIconData"
+                                            t-if="shouldUseOdooAppIcon(app)"
                                             class="o_shopall_nav_parent_icon rounded flex-shrink-0"
                                             t-att-src="app.webIconData"
                                             alt=""
                                         />
-                                        <i t-else="" class="fa fa-folder-o o_shopall_nav_parent_icon_fa text-muted flex-shrink-0" aria-hidden="true"/>
+                                        <i t-else="" t-att-class="appThemeIconClass(app) + ' o_shopall_nav_parent_icon_fa o_shopall_nav_parent_icon_theme flex-shrink-0'" aria-hidden="true"/>
                                     </button>
                                     <t t-set-slot="content">
                                         <ShopallSidebarNarrowFlyoutMenu t-props="narrowFlyoutMenuProps(app)"/>
@@ -99,12 +99,12 @@
                                     t-on-click="(ev) => this.onNarrowAppWithoutChildren(app, ev)"
                                 >
                                     <img
-                                        t-if="app.webIconData"
+                                        t-if="shouldUseOdooAppIcon(app)"
                                         class="o_shopall_nav_parent_icon rounded flex-shrink-0"
                                         t-att-src="app.webIconData"
                                         alt=""
                                     />
-                                    <i t-else="" class="fa fa-folder-o o_shopall_nav_parent_icon_fa text-muted flex-shrink-0" aria-hidden="true"/>
+                                    <i t-else="" t-att-class="appThemeIconClass(app) + ' o_shopall_nav_parent_icon_fa o_shopall_nav_parent_icon_theme flex-shrink-0'" aria-hidden="true"/>
                                 </button>
                             </t>
                         </t>
@@ -120,12 +120,12 @@
                                 t-on-click="(ev) => this.toggleApp(app, ev)"
                             >
                                 <img
-                                    t-if="app.webIconData"
+                                    t-if="shouldUseOdooAppIcon(app)"
                                     class="o_shopall_nav_parent_icon rounded"
                                     t-att-src="app.webIconData"
                                     alt=""
                                 />
-                                <i t-else="" class="fa fa-folder-o o_shopall_nav_parent_icon_fa text-muted" aria-hidden="true"/>
+                                <i t-else="" t-att-class="appThemeIconClass(app) + ' o_shopall_nav_parent_icon_fa o_shopall_nav_parent_icon_theme'" aria-hidden="true"/>
                                 <span class="o_shopall_sidebar_label text-truncate fw-semibold flex-grow-1" t-esc="app.name"/>
                                 <i class="fa fa-chevron-up o_shopall_nav_chevron small" aria-hidden="true"/>
                             </div>

@@ -45,6 +45,9 @@ SHOPALL_THEME_ICP_DEFAULTS = (
     ("web_shopall_theme.border_color", "#eaecf0"),
 )
 
+SHOPALL_THEME_APP_ICON_STYLE_DEFAULT = "shopall"
+SHOPALL_THEME_APP_ICON_STYLES = ("shopall", "odoo")
+
 
 def shopall_theme_icp_session_key(icp_key):
     """web_shopall_theme.primary_color -> primary"""
@@ -85,6 +88,16 @@ class ResConfigSettings(models.TransientModel):
         default="#eaecf0",
         config_parameter="web_shopall_theme.border_color",
     )
+    shopall_theme_app_icon_style = fields.Selection(
+        [
+            ("shopall", "Shopall theme icons"),
+            ("odoo", "Default Odoo icons"),
+        ],
+        string="App icons",
+        help="Choose whether sidebar app icons use the Shopall theme icon set or each app's default Odoo icon.",
+        default=SHOPALL_THEME_APP_ICON_STYLE_DEFAULT,
+        config_parameter="web_shopall_theme.app_icon_style",
+    )
 
     _THEME_FIELDS = (
         "shopall_theme_primary",
@@ -120,6 +133,15 @@ class ResConfigSettings(models.TransientModel):
         for param, default in SHOPALL_THEME_ICP_DEFAULTS:
             cur = icp.get_param(param, default)
             icp.set_param(param, sanitize_theme_hex(cur, default))
+        icon_style = icp.get_param(
+            "web_shopall_theme.app_icon_style",
+            SHOPALL_THEME_APP_ICON_STYLE_DEFAULT,
+        )
+        if icon_style not in SHOPALL_THEME_APP_ICON_STYLES:
+            icp.set_param(
+                "web_shopall_theme.app_icon_style",
+                SHOPALL_THEME_APP_ICON_STYLE_DEFAULT,
+            )
 
     def action_shopall_theme_reset_defaults(self):
         """Restore design-default colors in ir.config_parameter and reload the UI."""
@@ -127,6 +149,10 @@ class ResConfigSettings(models.TransientModel):
         icp = self.env["ir.config_parameter"].sudo()
         for param, value in SHOPALL_THEME_ICP_DEFAULTS:
             icp.set_param(param, value)
+        icp.set_param(
+            "web_shopall_theme.app_icon_style",
+            SHOPALL_THEME_APP_ICON_STYLE_DEFAULT,
+        )
         return {
             "type": "ir.actions.client",
             "tag": "soft_reload",

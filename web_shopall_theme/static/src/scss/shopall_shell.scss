@@ -290,6 +290,11 @@ body.o_shopall_theme.o_shopall_sidebar_collapsed {
     text-align: center;
 }
 
+.o_shopall_nav_parent_icon_theme {
+    color: var(--shopall-primary, #5b4fec);
+    opacity: 0.9;
+}
+
 .o_shopall_nav_chevron {
     transition: transform 0.2s ease;
     color: var(--shopall-primary, #5b4fec);
