@@ -45,7 +45,7 @@ export class ShopallDashboard extends Component {
             this.state.data = payload;
         } catch (e) {
             console.error(e);
-            this.notification.add(_t("Could not load dashboard data."), { type: "danger" });
+            this.notification.add(_t("Could not load overview data."), { type: "danger" });
             this.state.data = null;
         } finally {
             this.state.loading = false;
