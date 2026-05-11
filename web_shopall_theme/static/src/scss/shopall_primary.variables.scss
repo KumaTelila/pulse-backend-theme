@@ -1,0 +1,16 @@
+// Shopall dashboard tokens — compiled defaults; runtime accent via CSS variables (see shopall_dynamic.scss)
+
+$o-shopall-primary: #5b4fec !default;
+$o-shopall-text: #1a1a2e !default;
+$o-shopall-muted: #6b7280 !default;
+$o-shopall-border: #eaecf0 !default;
+$o-shopall-canvas: #f4f5f7 !default;
+
+$o-brand-odoo: $o-shopall-primary !default;
+$o-brand-primary: $o-shopall-primary !default;
+$o-action: $o-shopall-primary !default;
+
+$o-main-text-color: $o-shopall-text !default;
+$o-main-color-muted: $o-shopall-muted !default;
+
+$o-gray-100: #f8f9fa !default; // keep BS scale but align border

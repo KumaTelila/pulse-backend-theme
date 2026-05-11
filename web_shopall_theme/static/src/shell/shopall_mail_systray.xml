@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!--
+        Core hides the messages systray trigger in Discuss (desktop): only the expanded
+        panel renders. Keep the classic dropdown + icon on desktop; keep full inline
+        panel only for small Discuss (embedded MessagingMenu in Discuss layout).
+    -->
+    <t t-inherit="mail.MessagingMenu" t-inherit-mode="extension">
+        <xpath expr="//t[@t-name='mail.MessagingMenu']/t[@t-if='env.inDiscussApp']" position="attributes">
+            <attribute name="t-if">env.inDiscussApp and ui.isSmall</attribute>
+        </xpath>
+        <xpath expr="//t[@t-name='mail.MessagingMenu']/div[@t-if='!env.inDiscussApp']" position="attributes">
+            <attribute name="t-if">!env.inDiscussApp || !ui.isSmall</attribute>
+        </xpath>
+    </t>
+</templates>

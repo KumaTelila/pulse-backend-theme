@@ -1,0 +1,246 @@
+// Dashboard content (mirrors odoo_dashboard_theme.html layout, scoped)
+
+.o_shopall_dash {
+    font-size: 13px;
+    color: var(--shopall-text, #1a1a2e);
+    background: var(--shopall-canvas, #f4f5f7);
+}
+
+.o_shopall_dash_upgrade {
+    background: var(--shopall-primary, #5b4fec);
+    padding: 12px 18px;
+}
+
+.o_shopall_dash_section_title {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.o_shopall_dash_badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid var(--shopall-border, #eaecf0);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 11px;
+}
+
+.o_shopall_dash_muted {
+    color: var(--shopall-muted, #6b7280);
+    background: #fff;
+}
+
+.o_shopall_dash_btn_outline {
+    border: 1px solid var(--shopall-border, #eaecf0) !important;
+    background: #fff !important;
+    color: var(--shopall-muted, #6b7280) !important;
+    font-size: 11px;
+
+    &:hover {
+        border-color: var(--shopall-primary, #5b4fec) !important;
+        color: var(--shopall-primary, #5b4fec) !important;
+    }
+}
+
+.o_shopall_dash_metric {
+    background: #fff;
+    border: 1px solid var(--shopall-border, #eaecf0);
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+
+    &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 3px;
+        height: 100%;
+        background: var(--shopall-primary, #5b4fec);
+        opacity: 0.5;
+        border-radius: 0 10px 10px 0;
+    }
+}
+
+.o_shopall_dash_metric_top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.o_shopall_dash_metric_label {
+    font-size: 11px;
+    color: var(--shopall-muted, #6b7280);
+    font-weight: 500;
+}
+
+.o_shopall_dash_metric_icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: var(--shopall-primary-light, #ede9fd);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--shopall-primary, #5b4fec);
+    font-size: 14px;
+}
+
+.o_shopall_dash_metric_value {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.o_shopall_dash_metric_delta {
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 500;
+
+    &.up {
+        color: #16a34a;
+    }
+
+    &.down {
+        color: #dc2626;
+    }
+}
+
+.o_shopall_dash_metric_hint {
+    margin-top: 4px;
+}
+
+.o_shopall_dash_chart_card {
+    background: #fff;
+    border: 1px solid var(--shopall-border, #eaecf0);
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.o_shopall_dash_chart_head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    gap: 12px;
+}
+
+.o_shopall_dash_chart_title {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.o_shopall_dash_chart_big {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.o_shopall_dash_chart_sub {
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.o_shopall_dash_canvas_wrap {
+    position: relative;
+    height: 180px;
+}
+
+.o_shopall_dash_tabs {
+    gap: 0;
+}
+
+.o_shopall_dash_tab {
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--shopall-muted, #6b7280);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+
+    &:hover {
+        color: var(--shopall-primary, #5b4fec);
+    }
+
+    &.active {
+        color: var(--shopall-primary, #5b4fec);
+        border-bottom-color: var(--shopall-primary, #5b4fec);
+        font-weight: 600;
+    }
+}
+
+.o_shopall_dash_tab_badge {
+    background: var(--shopall-primary, #5b4fec);
+    color: #fff;
+    font-size: 9px;
+    padding: 1px 5px;
+    border-radius: 10px;
+    margin-left: 4px;
+}
+
+.o_shopall_dash_table {
+    thead th {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--shopall-muted, #6b7280);
+        background: var(--shopall-canvas, #f4f5f7);
+    }
+
+    tbody tr:hover td {
+        background: var(--shopall-primary-light, #ede9fd);
+    }
+}
+
+.o_shopall_dash_status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+
+    &::before {
+        content: "";
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    &.o_shopall_dash_status_completed {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+
+    &.o_shopall_dash_status_pending {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    &.o_shopall_dash_status_inprogress {
+        background: #e0f2fe;
+        color: #0ea5e9;
+    }
+
+    &.o_shopall_dash_status_cancelled {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+}
+
+.o_shopall_dash_page.btn-primary {
+    background-color: var(--shopall-primary, #5b4fec) !important;
+    border-color: var(--shopall-primary, #5b4fec) !important;
+}

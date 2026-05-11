@@ -1,0 +1,17 @@
+// Canvas and surfaces — complements shopall_shell.scss (control panel, lists).
+
+body.o_shopall_theme .o_shopall_shell .o_action .o_control_panel {
+    border-bottom: 1px solid var(--shopall-border, #eaecf0);
+    background-color: #ffffff;
+}
+
+body.o_shopall_theme .o_shopall_shell .o_content {
+    background-color: transparent;
+}
+
+body.o_shopall_theme .o_shopall_shell .o_list_renderer .o_list_table thead {
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    color: var(--shopall-muted, #6b7280);
+}

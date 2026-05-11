@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="web_shopall_theme.ShopallSidebar">
+        <aside class="o_shopall_sidebar d-none d-lg-flex flex-column flex-shrink-0 h-100 bg-white border-end">
+            <div class="o_shopall_sidebar_brand d-flex align-items-center gap-2 px-3 py-3 border-bottom">
+                <t t-if="companyName">
+                    <img
+                        t-if="companyLogoUrl"
+                        class="o_shopall_sidebar_brand_logo rounded flex-shrink-0"
+                        t-att-src="companyLogoUrl"
+                        alt=""
+                        t-on-error="onCompanyHeaderLogoError"
+                    />
+                    <div
+                        t-else=""
+                        class="o_shopall_sidebar_logo rounded d-flex align-items-center justify-content-center text-white fw-bold flex-shrink-0"
+                        t-esc="companyInitial"
+                    />
+                    <span class="fw-bold text-primary fs-6 mb-0 text-truncate" t-esc="companyName"/>
+                </t>
+                <t t-else="">
+                    <div class="o_shopall_sidebar_logo rounded d-flex align-items-center justify-content-center text-white fw-bold">
+                        <i class="fa fa-shopping-bag" title="Apps" aria-hidden="true"/>
+                    </div>
+                    <span class="fw-bold text-primary fs-6 mb-0">Shopall</span>
+                </t>
+            </div>
+
+            <nav class="o_shopall_sidebar_nav flex-grow-1 overflow-auto py-2 min-w-0">
+                <a
+                    href="#"
+                    class="o_shopall_sidebar_item d-flex align-items-center gap-2 rounded text-decoration-none"
+                    t-att-class="{ o_shopall_sidebar_item_active: isDashboardActive() }"
+                    t-on-click="(ev) => this.onDashboardClick(ev)"
+                >
+                    <i class="fa fa-th-large" aria-hidden="true"/>
+                    <span>Dashboard</span>
+                </a>
+
+                <t t-foreach="apps" t-as="app" t-key="app.id">
+                    <div class="o_shopall_sidebar_app_block">
+                        <div
+                            class="o_shopall_nav_parent d-flex align-items-center gap-2 rounded"
+                            t-att-class="{
+                                collapsed: !isAppExpanded(app),
+                                active: isAppActive(app),
+                            }"
+                            role="button"
+                            tabindex="0"
+                            t-on-click="(ev) => this.toggleApp(app, ev)"
+                        >
+                            <img
+                                t-if="app.webIconData"
+                                class="o_shopall_nav_parent_icon rounded"
+                                t-att-src="app.webIconData"
+                                alt=""
+                            />
+                            <i t-else="" class="fa fa-folder-o o_shopall_nav_parent_icon_fa text-muted" aria-hidden="true"/>
+                            <span class="text-truncate fw-semibold flex-grow-1" t-esc="app.name"/>
+                            <i class="fa fa-chevron-up o_shopall_nav_chevron small" aria-hidden="true"/>
+                        </div>
+                        <div
+                            class="o_shopall_nav_children"
+                            t-att-class="{'collapsed': !isAppExpanded(app)}"
+                        >
+                            <t t-call="web_shopall_theme.ShopallSidebar.MenuBranch">
+                                <t t-set="menus" t-value="appTree(app).childrenTree"/>
+                                <t t-set="level" t-value="1"/>
+                            </t>
+                        </div>
+                    </div>
+                </t>
+            </nav>
+
+            <!-- Bottom profile block (fixed under scroll area, matches design HTML). -->
+            <div class="o_shopall_sidebar_bottom flex-shrink-0">
+                <div class="o_shopall_sidebar_profile_label">
+                    Profile
+                </div>
+                <a
+                    t-if="discussMenu"
+                    href="#"
+                    class="o_shopall_sidebar_footer_item"
+                    t-on-click="(ev) => this.onDiscussClick(ev)"
+                >
+                    <i class="fa fa-comments-o" aria-hidden="true"/>
+                    <span>Discuss</span>
+                </a>
+                <a
+                    href="#"
+                    class="o_shopall_sidebar_footer_item"
+                    t-on-click="(ev) => this.onPreferencesClick(ev)"
+                >
+                    <i class="fa fa-cog" aria-hidden="true"/>
+                    <span>Settings</span>
+                </a>
+                <a
+                    href="#"
+                    class="o_shopall_sidebar_footer_item"
+                    t-on-click="(ev) => this.onLogoutClick(ev)"
+                >
+                    <i class="fa fa-sign-out" aria-hidden="true"/>
+                    <span>Log out</span>
+                </a>
+                <div class="o_shopall_sidebar_footer">
+                    <button
+                        type="button"
+                        class="o_shopall_sidebar_user_card"
+                        t-on-click="(ev) => this.onUserCardClick(ev)"
+                    >
+                        <img
+                            t-if="userAvatarSrc"
+                            class="o_shopall_sidebar_user_avatar_img rounded-circle"
+                            t-att-src="userAvatarSrc"
+                            alt=""
+                        />
+                        <div
+                            t-else=""
+                            class="o_shopall_sidebar_user_avatar rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
+                            t-esc="userInitials"
+                        />
+                        <div class="o_shopall_sidebar_user_info">
+                            <div class="o_shopall_sidebar_user_name text-truncate" t-esc="userName"/>
+                            <div class="o_shopall_sidebar_user_email text-truncate" t-esc="userEmail"/>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </aside>
+    </t>
+
+    <!-- Recursive branch: mirrors nav-sub-parent / nav-leaf from the HTML design. -->
+    <t t-name="web_shopall_theme.ShopallSidebar.MenuBranch">
+        <t t-foreach="menus" t-as="menu" t-key="menu.id">
+            <t t-if="hasMenuBranches(menu)">
+                <div class="o_shopall_nav_folder">
+                    <div
+                        class="o_shopall_nav_sub_parent d-flex align-items-center justify-content-between rounded"
+                        t-attf-class="o_shopall_nav_level_{{level}}"
+                        t-att-class="{ collapsed: !isNodeExpanded(menu) }"
+                        t-att-style="subFolderRowStyle(level)"
+                        role="button"
+                        tabindex="0"
+                        t-on-click="(ev) => this.toggleNode(menu, ev)"
+                    >
+                        <span class="text-truncate fw-semibold" t-esc="menu.name"/>
+                        <i class="fa fa-chevron-up o_shopall_nav_chevron small ms-1 flex-shrink-0" aria-hidden="true"/>
+                    </div>
+                    <div
+                        class="o_shopall_nav_children"
+                        t-att-class="{
+                            collapsed: !isNodeExpanded(menu),
+                            o_shopall_nav_nested: true,
+                        }"
+                    >
+                        <t t-call="web_shopall_theme.ShopallSidebar.MenuBranch">
+                            <t t-set="menus" t-value="menu.childrenTree"/>
+                            <t t-set="level" t-value="level + 1"/>
+                        </t>
+                    </div>
+                </div>
+            </t>
+            <t t-if="!hasMenuBranches(menu)">
+                <a
+                    href="#"
+                    class="o_shopall_nav_leaf d-flex align-items-center gap-2 rounded text-decoration-none"
+                    t-attf-class="o_shopall_nav_level_{{level}}"
+                    t-att-class="{'active': isLeafActive(menu)}"
+                    t-att-style="leafRowStyle(level)"
+                    t-att-href="getMenuItemHref(menu)"
+                    t-on-click="(ev) => this.onMenuLeafClick(menu, ev)"
+                >
+                    <span class="text-truncate flex-grow-1" t-esc="menu.name"/>
+                </a>
+            </t>
+        </t>
+    </t>
+</templates>

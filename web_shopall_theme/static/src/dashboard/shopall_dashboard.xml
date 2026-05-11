@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="web_shopall_theme.ShopallDashboard">
+        <div class="o_shopall_dash h-100 overflow-auto bg-view">
+            <div class="o_shopall_dash_inner p-4 position-relative">
+                <div t-if="state.loading" class="o_shopall_dash_refresh position-absolute top-0 end-0 p-2" style="z-index: 2;">
+                    <i class="fa fa-spinner fa-spin text-primary" aria-hidden="true" title="Loading"/>
+                </div>
+                <div t-if="!state.upgradeHidden" class="o_shopall_dash_upgrade d-flex align-items-center gap-3 mb-4 rounded text-white">
+                    <i class="fa fa-unlock-alt" aria-hidden="true"/>
+                    <p class="mb-0 flex-grow-1 small opacity-75">
+                        Unlock premium features — Upgrade to Pro for unlimited analytics and real-time insights.
+                    </p>
+                    <div class="d-flex gap-2">
+                        <a href="https://www.odoo.com/pricing" target="_blank" rel="noreferrer" class="btn btn-sm btn-light fw-bold">
+                            Upgrade Now
+                        </a>
+                        <button type="button" class="btn btn-sm btn-outline-light" t-on-click="() => this.dismissUpgrade()">
+                            Dismiss
+                        </button>
+                    </div>
+                </div>
+
+                <div class="o_shopall_dash_section_head d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                    <span class="o_shopall_dash_section_title">Overview</span>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <span class="o_shopall_dash_badge o_shopall_dash_muted d-flex align-items-center gap-1">
+                            <i class="fa fa-calendar" aria-hidden="true"/>
+                            <t t-esc="state.data?.period_days || 30"/> days
+                        </span>
+                        <span class="o_shopall_dash_badge o_shopall_dash_muted d-flex align-items-center gap-1">
+                            <i class="fa fa-clock-o" aria-hidden="true"/>
+                            Last <t t-esc="state.data?.period_days || 30"/> days
+                        </span>
+                        <button type="button" class="o_shopall_dash_btn_outline btn btn-sm" t-on-click="() => this.onExportClick()">
+                            <i class="fa fa-download" aria-hidden="true"/>
+                            Export
+                        </button>
+                    </div>
+                </div>
+
+                <div t-if="!state.data?.sale_installed" class="alert alert-info">
+                    Install the <strong>Sales</strong> app to see live revenue, orders, and charts. Metrics stay at zero until then.
+                </div>
+
+                <div class="o_shopall_dash_metrics row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3 mb-4">
+                    <div class="col">
+                        <div class="o_shopall_dash_metric">
+                            <div class="o_shopall_dash_metric_top">
+                                <span class="o_shopall_dash_metric_label">Revenue</span>
+                                <span class="o_shopall_dash_metric_icon"><i class="fa fa-usd" aria-hidden="true"/></span>
+                            </div>
+                            <div class="o_shopall_dash_metric_value" t-esc="formatMoney(state.data?.metrics?.revenue || 0)"/>
+                            <div t-att-class="'o_shopall_dash_metric_delta ' + metricDeltaClass(state.data?.metrics?.revenue_delta_pct)">
+                                <i t-att-class="'fa ' + deltaIconClass(state.data?.metrics?.revenue_delta_pct)" aria-hidden="true"/>
+                                <t t-esc="formatDelta(state.data?.metrics?.revenue_delta_pct)"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="o_shopall_dash_metric">
+                            <div class="o_shopall_dash_metric_top">
+                                <span class="o_shopall_dash_metric_label">Total Sales</span>
+                                <span class="o_shopall_dash_metric_icon"><i class="fa fa-shopping-bag" aria-hidden="true"/></span>
+                            </div>
+                            <div class="o_shopall_dash_metric_value" t-esc="formatQty(state.data?.metrics?.total_sales_qty || 0)"/>
+                            <div t-att-class="'o_shopall_dash_metric_delta ' + metricDeltaClass(state.data?.metrics?.total_sales_qty_delta_pct)">
+                                <i t-att-class="'fa ' + deltaIconClass(state.data?.metrics?.total_sales_qty_delta_pct)" aria-hidden="true"/>
+                                <t t-esc="formatDelta(state.data?.metrics?.total_sales_qty_delta_pct)"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="o_shopall_dash_metric">
+                            <div class="o_shopall_dash_metric_top">
+                                <span class="o_shopall_dash_metric_label">Total Orders</span>
+                                <span class="o_shopall_dash_metric_icon"><i class="fa fa-list-alt" aria-hidden="true"/></span>
+                            </div>
+                            <div class="o_shopall_dash_metric_value" t-esc="formatQty(state.data?.metrics?.order_count || 0)"/>
+                            <div t-att-class="'o_shopall_dash_metric_delta ' + metricDeltaClass(state.data?.metrics?.order_count_delta_pct)">
+                                <i t-att-class="'fa ' + deltaIconClass(state.data?.metrics?.order_count_delta_pct)" aria-hidden="true"/>
+                                <t t-esc="formatDelta(state.data?.metrics?.order_count_delta_pct)"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="o_shopall_dash_metric">
+                            <div class="o_shopall_dash_metric_top">
+                                <span class="o_shopall_dash_metric_label">Profit</span>
+                                <span class="o_shopall_dash_metric_icon"><i class="fa fa-line-chart" aria-hidden="true"/></span>
+                            </div>
+                            <div class="o_shopall_dash_metric_value" t-if="state.data?.metrics?.has_profit" t-esc="formatMoney(state.data?.metrics?.profit || 0)"/>
+                            <div class="o_shopall_dash_metric_value" t-else="">—</div>
+                            <div t-if="state.data?.metrics?.has_profit" t-att-class="'o_shopall_dash_metric_delta ' + metricDeltaClass(state.data?.metrics?.profit_delta_pct)">
+                                <i t-att-class="'fa ' + deltaIconClass(state.data?.metrics?.profit_delta_pct)" aria-hidden="true"/>
+                                <t t-esc="formatDelta(state.data?.metrics?.profit_delta_pct)"/>
+                            </div>
+                            <div class="o_shopall_dash_metric_hint small text-muted" t-else="">
+                                Install <strong>sale_margin</strong> to show margin.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="o_shopall_dash_charts row g-3 mb-4">
+                    <div class="col-lg-8">
+                        <div class="o_shopall_dash_chart_card h-100">
+                            <div class="o_shopall_dash_chart_head">
+                                <div>
+                                    <div class="o_shopall_dash_chart_title">Total Sales</div>
+                                    <div class="o_shopall_dash_chart_big" t-esc="formatQty(state.data?.chart_stats?.bar_total || 0)"/>
+                                    <div class="o_shopall_dash_chart_sub text-success" t-if="state.data?.chart_stats?.bar_delta_pct != null">
+                                        <t t-if="state.data?.chart_stats?.bar_delta_pct &gt;= 0">↑</t>
+                                        <t t-else="">↓</t>
+                                        <t t-esc="state.data.chart_stats.bar_delta_pct"/>% vs prev.
+                                    </div>
+                                </div>
+                                <span class="o_shopall_dash_badge o_shopall_dash_muted">
+                                    <i class="fa fa-clock-o" aria-hidden="true"/> Last <t t-esc="state.data?.period_days || 30"/> days
+                                </span>
+                            </div>
+                            <div class="o_shopall_dash_canvas_wrap">
+                                <canvas t-ref="barCanvas" role="img" aria-label="Sales by day"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="o_shopall_dash_chart_card h-100">
+                            <div class="o_shopall_dash_chart_head">
+                                <div>
+                                    <div class="o_shopall_dash_chart_title">Total Revenue</div>
+                                    <div class="o_shopall_dash_chart_big" t-esc="formatMoney(state.data?.chart_stats?.line_total || 0)"/>
+                                    <div class="o_shopall_dash_chart_sub text-success" t-if="state.data?.chart_stats?.line_delta_pct != null">
+                                        <t t-if="state.data?.chart_stats?.line_delta_pct &gt;= 0">↑</t>
+                                        <t t-else="">↓</t>
+                                        <t t-esc="state.data.chart_stats.line_delta_pct"/>% vs prev.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_shopall_dash_canvas_wrap">
+                                <canvas t-ref="lineCanvas" role="img" aria-label="Revenue trend"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="o_shopall_dash_sales card border-0 shadow-sm">
+                    <div class="o_shopall_dash_sales_head d-flex align-items-center justify-content-between flex-wrap gap-2 border-bottom px-3 py-3">
+                        <span class="o_shopall_dash_section_title mb-0">Last Sales</span>
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <button type="button" class="o_shopall_dash_btn_outline btn btn-sm" t-on-click="() => this.openSaleOrders()">
+                                <i class="fa fa-eye" aria-hidden="true"/> View all
+                            </button>
+                            <span class="o_shopall_dash_badge o_shopall_dash_muted">
+                                <i class="fa fa-clock-o" aria-hidden="true"/> Last <t t-esc="state.data?.period_days || 30"/> days
+                            </span>
+                            <button type="button" class="o_shopall_dash_btn_outline btn btn-sm" t-on-click="() => this.onExportClick()">
+                                <i class="fa fa-download" aria-hidden="true"/> Export
+                            </button>
+                        </div>
+                    </div>
+                    <div class="o_shopall_dash_tabs d-flex border-bottom px-3 flex-wrap">
+                        <button type="button" class="o_shopall_dash_tab" t-att-class="{ active: state.tab === 'all' }" t-on-click="() => this.onTabClick('all')">
+                            All
+                        </button>
+                        <button type="button" class="o_shopall_dash_tab" t-att-class="{ active: state.tab === 'completed' }" t-on-click="() => this.onTabClick('completed')">
+                            Completed
+                        </button>
+                        <button type="button" class="o_shopall_dash_tab" t-att-class="{ active: state.tab === 'in_progress' }" t-on-click="() => this.onTabClick('in_progress')">
+                            In Progress
+                        </button>
+                        <button type="button" class="o_shopall_dash_tab d-flex align-items-center gap-1" t-att-class="{ active: state.tab === 'pending' }" t-on-click="() => this.onTabClick('pending')">
+                            Pending
+                            <span class="o_shopall_dash_tab_badge" t-if="state.data?.pending_tab_count" t-esc="state.data.pending_tab_count"/>
+                        </button>
+                        <button type="button" class="o_shopall_dash_tab" t-att-class="{ active: state.tab === 'cancelled' }" t-on-click="() => this.onTabClick('cancelled')">
+                            Cancelled
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="o_shopall_dash_table table mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="width: 36px"/>
+                                    <th>Client Name</th>
+                                    <th>Date</th>
+                                    <th>Price</th>
+                                    <th>Category</th>
+                                    <th>Product</th>
+                                    <th>City</th>
+                                    <th>Status</th>
+                                    <th style="width: 36px"/>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="state.data?.table?.rows || []" t-as="row" t-key="row.id">
+                                    <td><input type="checkbox" class="form-check-input" disabled="" title="Selection coming soon"/></td>
+                                    <td class="fw-semibold" t-esc="row.partner_name"/>
+                                    <td class="text-muted" t-esc="formatRowDate(row.date_order)"/>
+                                    <td class="fw-semibold" t-esc="formatMoney(row.amount_total)"/>
+                                    <td t-esc="row.category"/>
+                                    <td class="text-muted text-truncate" style="max-width: 160px" t-esc="row.product_name"/>
+                                    <td t-esc="row.city"/>
+                                    <td>
+                                        <span t-att-class="'o_shopall_dash_status ' + rowStatusClass(row.state)" t-esc="rowStatusLabel(row.state)"/>
+                                    </td>
+                                    <td class="text-muted text-center">
+                                        <i class="fa fa-ellipsis-h" aria-hidden="true"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div t-if="!(state.data?.table?.rows?.length)" class="p-4 text-center text-muted">
+                            No sales in this period for the selected filter.
+                        </div>
+                    </div>
+                    <div class="o_shopall_dash_pagination d-flex justify-content-end gap-1 p-3 border-top" t-if="state.data?.table?.total">
+                        <button type="button" class="o_shopall_dash_page btn btn-sm btn-light border" t-on-click="() => this.onPageChange(1)" title="First">
+                            <i class="fa fa-angle-double-left" aria-hidden="true"/>
+                        </button>
+                        <button type="button" class="o_shopall_dash_page btn btn-sm btn-light border" t-on-click="() => this.onPageChange(state.data.table.page - 1)" title="Previous">
+                            <i class="fa fa-angle-left" aria-hidden="true"/>
+                        </button>
+                        <t t-foreach="pageNums()" t-as="pn" t-key="pn">
+                            <button type="button" class="o_shopall_dash_page btn btn-sm border" t-att-class="{ 'btn-primary': pn === state.data.table.page, 'btn-light': pn !== state.data.table.page }" t-esc="pn" t-on-click="() => this.onPageChange(pn)"/>
+                        </t>
+                        <button type="button" class="o_shopall_dash_page btn btn-sm btn-light border" t-on-click="() => this.onPageChange(state.data.table.page + 1)" title="Next">
+                            <i class="fa fa-angle-right" aria-hidden="true"/>
+                        </button>
+                        <button type="button" class="o_shopall_dash_page btn btn-sm btn-light border" t-on-click="() => this.onPageChange(this.lastTablePage())" title="Last">
+                            <i class="fa fa-angle-double-right" aria-hidden="true"/>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

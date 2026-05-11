@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!-- Same extension strategy as Atlas: shell wraps sidebar + main column; remove duplicate action/main containers. -->
+    <t t-inherit="web.WebClient" t-inherit-mode="extension">
+        <xpath expr="//t[@t-if='!state.fullscreen']" position="replace">
+            <div
+                class="o_shopall_shell"
+                t-att-class="{'o_shopall_shell_fullscreen': state.fullscreen}"
+            >
+                <t t-if="!state.fullscreen">
+                    <ShopallSidebar/>
+                </t>
+                <div class="o_shopall_shell_main">
+                    <t t-if="!state.fullscreen">
+                        <NavBar/>
+                    </t>
+                    <ActionContainer/>
+                    <MainComponentsContainer/>
+                </div>
+            </div>
+        </xpath>
+        <xpath expr="/t/ActionContainer" position="replace"/>
+        <xpath expr="/t/MainComponentsContainer" position="replace"/>
+    </t>
+</templates>

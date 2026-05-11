@@ -1,0 +1,376 @@
+// Shell layout: mirrors Atlas pattern (.o_* shell wraps action manager) so flex height/scroll still work.
+
+body.o_shopall_theme.o_web_client {
+    height: 100vh;
+    overflow: hidden;
+    background: var(--shopall-canvas, #f4f5f7);
+}
+
+body.o_shopall_theme.o_web_client > .o_shopall_shell {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.o_shopall_shell {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    min-width: 0;
+    background: var(--shopall-canvas, #f4f5f7);
+}
+
+.o_shopall_shell_main {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--shopall-canvas, #f4f5f7);
+}
+
+// Action manager lives inside shell main (not direct child of .o_web_client anymore).
+.o_shopall_shell .o_action_manager {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: var(--shopall-canvas, #f4f5f7);
+}
+
+.o_shopall_shell .o_action_manager > .o_action {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-flow: column nowrap;
+    overflow: hidden;
+}
+
+.o_shopall_shell .o_content {
+    flex: 1 1 auto;
+    min-height: 0;
+    position: relative;
+    overflow: auto;
+}
+
+.o_shopall_shell .o_content > .o_view_controller {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+}
+
+// ---------------------------------------------------------------------------
+// Sidebar accordion (design: nav-parent / nav-children / nav-sub-parent / nav-leaf)
+// ---------------------------------------------------------------------------
+.o_shopall_sidebar {
+    width: var(--shopall-sidebar-width, 220px);
+    min-width: var(--shopall-sidebar-width, 220px);
+    min-height: 0;
+    z-index: 2;
+}
+
+.o_shopall_sidebar_brand {
+    min-height: 52px;
+}
+
+.o_shopall_sidebar_logo {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+    background: var(--shopall-primary, #5b4fec);
+    border-radius: 7px;
+}
+
+.o_shopall_sidebar_brand_logo {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    background: #fff;
+    border: 1px solid var(--shopall-border, #eaecf0);
+    border-radius: 7px;
+}
+
+.o_shopall_sidebar_nav {
+    // scroll area
+    min-height: 0;
+}
+
+.o_shopall_sidebar_item {
+    gap: 9px;
+    padding: 8px 12px;
+    margin: 1px 8px;
+    margin-top: 6px;
+    color: var(--shopall-muted, #6b7280);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+
+    &:hover {
+        background: var(--shopall-primary-light, #ede9fd);
+        color: var(--shopall-primary, #5b4fec);
+    }
+
+    &.o_shopall_sidebar_item_active {
+        background: var(--shopall-primary-light, #ede9fd);
+        color: var(--shopall-primary, #5b4fec);
+        font-weight: 600;
+    }
+}
+
+// Top-level app row — matches .nav-parent in design HTML
+.o_shopall_nav_parent {
+    gap: 9px;
+    padding: 8px 12px;
+    margin: 1px 8px;
+    color: var(--shopall-primary, #5b4fec);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+        background: var(--shopall-primary-light, #ede9fd);
+    }
+
+    &.active {
+        background: var(--shopall-primary-light, #ede9fd);
+    }
+
+    &.collapsed .o_shopall_nav_chevron {
+        transform: rotate(-90deg);
+    }
+}
+
+.o_shopall_nav_parent_icon {
+    width: 20px;
+    height: 20px;
+    object-fit: cover;
+}
+
+.o_shopall_nav_parent_icon_fa {
+    width: 20px;
+    text-align: center;
+}
+
+.o_shopall_nav_chevron {
+    transition: transform 0.2s ease;
+    color: var(--shopall-primary, #5b4fec);
+}
+
+.o_shopall_nav_children {
+    overflow: hidden;
+    max-height: 2000px;
+    transition: max-height 0.25s ease;
+
+    &.collapsed {
+        max-height: 0;
+    }
+}
+
+// Nested wrapper: no extra horizontal inset (indent comes from row style by depth).
+.o_shopall_nav_nested {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+.o_shopall_nav_sub_parent {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--shopall-primary, #5b4fec);
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+        background: var(--shopall-primary-light, #ede9fd);
+    }
+
+    &.collapsed .o_shopall_nav_chevron {
+        transform: rotate(-90deg);
+    }
+}
+
+.o_shopall_nav_leaf {
+    font-size: 12px;
+    color: var(--shopall-muted, #6b7280);
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+
+    &:hover {
+        background: var(--shopall-primary-light, #ede9fd);
+        color: var(--shopall-primary, #5b4fec);
+    }
+
+    &.active {
+        color: var(--shopall-primary, #5b4fec);
+        font-weight: 600;
+        background: var(--shopall-primary-light, #ede9fd);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Sidebar bottom: Profile + quick links + user card (design HTML)
+// ---------------------------------------------------------------------------
+.o_shopall_sidebar_bottom {
+    flex-shrink: 0;
+    border-top: 1px solid var(--shopall-border, #eaecf0);
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+.o_shopall_sidebar_profile_label {
+    padding: 8px 12px 4px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--shopall-muted, #6b7280);
+}
+
+.o_shopall_sidebar_footer_item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 12px;
+    margin: 1px 8px;
+    border-radius: 6px;
+    color: var(--shopall-muted, #6b7280);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+
+    &:hover {
+        background: var(--shopall-primary-light, #ede9fd);
+        color: var(--shopall-primary, #5b4fec);
+    }
+
+    i {
+        width: 18px;
+        text-align: center;
+        flex-shrink: 0;
+    }
+}
+
+.o_shopall_sidebar_footer {
+    margin-top: auto;
+    padding: 12px;
+    border-top: 1px solid var(--shopall-border, #eaecf0);
+}
+
+.o_shopall_sidebar_user_card {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    padding: 8px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+        background: var(--shopall-canvas, #f4f5f7);
+    }
+}
+
+.o_shopall_sidebar_user_avatar,
+.o_shopall_sidebar_user_avatar_img {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+}
+
+.o_shopall_sidebar_user_avatar {
+    font-size: 11px;
+    background: var(--shopall-primary, #5b4fec);
+}
+
+.o_shopall_sidebar_user_avatar_img {
+    object-fit: cover;
+}
+
+.o_shopall_sidebar_user_info {
+    flex: 1;
+    min-width: 0;
+}
+
+.o_shopall_sidebar_user_name {
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--shopall-text, #1a1a2e);
+}
+
+.o_shopall_sidebar_user_email {
+    font-size: 10px;
+    color: var(--shopall-muted, #6b7280);
+}
+
+// Desktop: apps live in sidebar; hide grid dropdown trigger (mobile keeps o_menu_toggle).
+@media (min-width: 992px) {
+    .o_shopall_shell .o_shopall_navbar_apps_desktop {
+        display: none !important;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Navbar (single top row)
+// ---------------------------------------------------------------------------
+.o_shopall_navbar_header {
+    flex: 0 0 auto;
+    background: #fff;
+}
+
+.o_shopall_topbar.o_main_navbar {
+    border-bottom: 1px solid var(--shopall-border, #eaecf0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+// App name (e.g. Discuss): label hides on hover/focus of the brand control.
+@media (hover: hover) and (min-width: 992px) {
+    body.o_shopall_theme .o_shopall_menu_brand .o_shopall_menu_brand_label {
+        display: inline-block;
+        max-width: 280px;
+        transition: opacity 0.12s ease, max-width 0.18s ease, margin 0.18s ease;
+        vertical-align: bottom;
+    }
+
+    body.o_shopall_theme .o_shopall_menu_brand:hover .o_shopall_menu_brand_label,
+    body.o_shopall_theme .o_shopall_menu_brand:focus-visible .o_shopall_menu_brand_label {
+        opacity: 0;
+        max-width: 0;
+        margin: 0 !important;
+        overflow: hidden;
+    }
+}
+
+// Icon-only company control: compact, centered.
+body.o_shopall_theme .o_switch_company_menu button[data-hotkey="shift+u"] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.25rem;
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
+}
+
+.o_shopall_command_search {
+    max-width: 340px;
+    box-shadow: none;
+    font-size: 12px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.o_shopall_shell_fullscreen .o_shopall_shell_main {
+    background: inherit;
+}
