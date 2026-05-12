@@ -6,6 +6,13 @@ body.o_shopall_theme.o_web_client {
     background: var(--shopall-canvas, #f4f5f7);
 }
 
+@media (max-width: 767.98px) {
+    body.o_shopall_theme.o_web_client {
+        height: auto;
+        overflow: auto;
+    }
+}
+
 body.o_shopall_theme.o_web_client > .o_shopall_shell {
     flex: 1 1 auto;
     min-height: 0;
@@ -106,6 +113,13 @@ body.o_shopall_theme.o_shopall_sidebar_collapsed {
         outline-offset: -2px;
         z-index: 1;
     }
+}
+
+/* Ensure icons in the small sidebar toggle have no border/line */
+.o_shopall_sidebar_toggle i {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
 }
 
 .o_shopall_sidebar_narrow {
@@ -223,6 +237,17 @@ body.o_shopall_theme.o_shopall_sidebar_collapsed {
 .o_shopall_sidebar_nav {
     // scroll area
     min-height: 0;
+}
+
+/* Hide native scrollbars in the sidebar while keeping scroll functionality */
+.o_shopall_sidebar_nav {
+    overflow: auto;
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+.o_shopall_sidebar_nav::-webkit-scrollbar {
+    width: 0;
+    height: 0;
 }
 
 .o_shopall_sidebar_item {
@@ -428,6 +453,166 @@ body.o_shopall_theme.o_shopall_sidebar_collapsed {
     font-size: inherit;
     line-height: inherit;
     vertical-align: baseline;
+}
+
+// Mobile sidebar overlay.
+@media (max-width: 991.98px) {
+    .o_shopall_sidebar {
+        display: none !important;
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: #{"min(280px, 80vw)"};
+        max-width: 280px;
+        height: 100%;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+        z-index: 1051;
+        box-shadow: 2px 0 24px rgba(15, 23, 42, 0.18);
+        background: #fff;
+    }
+
+    .o_shopall_sidebar_backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.35);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+        z-index: 1050;
+    }
+
+    body.o_shopall_sidebar_mobile_open {
+        overflow: hidden;
+    }
+
+    body.o_shopall_sidebar_mobile_open .o_shopall_sidebar_backdrop {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    body.o_shopall_sidebar_mobile_open .o_shopall_sidebar.d-none,
+    body.o_shopall_sidebar_mobile_open .o_shopall_sidebar {
+        display: flex !important;
+        transform: translateX(0);
+        left: 0;
+        top: 0;
+        bottom: 0;
+        position: fixed;
+    }
+
+    /* When sidebar is open on mobile, show internal close button and hide desktop collapse icon */
+    body.o_shopall_sidebar_mobile_open .o_shopall_sidebar_toggle {
+        /* ensure the internal toggle sits above the content and is visible */
+        z-index: 1060;
+    }
+    .o_shopall_sidebar_toggle .o_shopall_sidebar_toggle_desktop {
+        display: inline-block;
+    }
+    .o_shopall_sidebar_toggle .o_shopall_sidebar_toggle_close {
+        display: none;
+    }
+    body.o_shopall_sidebar_mobile_open .o_shopall_sidebar_toggle .o_shopall_sidebar_toggle_desktop {
+        display: none !important;
+    }
+    body.o_shopall_sidebar_mobile_open .o_shopall_sidebar_toggle .o_shopall_sidebar_toggle_close {
+        display: inline-block !important;
+    }
+
+    /* Make the internal toggle visible when sidebar is acting as overlay (mobile) */
+    .o_shopall_sidebar.d-none .o_shopall_sidebar_toggle,
+    .o_shopall_sidebar.o_shopall_sidebar_overlay .o_shopall_sidebar_toggle {
+        display: flex;
+    }
+
+    /* Desktop rules were here but moved outside this mobile block */
+
+    .o_shopall_mobile_sidebar_toggle {
+        min-width: 2.5rem;
+        min-height: 2.5rem;
+        padding: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .o_shopall_mobile_search {
+        min-width: 2.5rem;
+        min-height: 2.5rem;
+        padding: 0.5rem;
+        font-size: 1rem;
+        border: 0 !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        color: var(--shopall-muted, #6b7280);
+
+        &:hover,
+        &:focus {
+            color: var(--shopall-primary, #5b4fec);
+            background: var(--shopall-canvas, #f4f5f7);
+        }
+    }
+
+    /* Hide core apps dropdown toggle (grid) in our navbar to avoid duplicate controls */
+    .o_shopall_navbar_apps_desktop > .o-dropdown,
+    .o_shopall_navbar_header .o_navbar_apps_menu > .o-dropdown {
+        display: none !important;
+    }
+
+    /* Toggle bars / close X icon visibility */
+    .o_shopall_mobile_sidebar_toggle .o_shopall_toggle_close {
+        display: none;
+    }
+    .o_shopall_mobile_sidebar_toggle .o_shopall_toggle_open {
+        display: inline-block;
+    }
+    body.o_shopall_sidebar_mobile_open .o_shopall_mobile_sidebar_toggle .o_shopall_toggle_open {
+        display: none !important;
+    }
+    body.o_shopall_sidebar_mobile_open .o_shopall_mobile_sidebar_toggle .o_shopall_toggle_close {
+        display: inline-block !important;
+    }
+
+    .o_shopall_topbar_search,
+    .o_shopall_navbar_route {
+        display: none !important;
+    }
+
+    .o_shopall_command_search {
+        width: 100%;
+    }
+}
+
+/* Desktop (lg and up) rules: moved outside mobile block so they actually apply */
+@media (min-width: 992px) {
+    /* Hide only the mobile close X inside the internal sidebar toggle on large screens */
+    body.o_shopall_theme .o_shopall_sidebar .o_shopall_sidebar_toggle > i.o_shopall_sidebar_toggle_close,
+    .o_shopall_sidebar_toggle_close {
+        display: none !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+    }
+
+    /* Ensure desktop collapse icon is visible when present */
+    body.o_shopall_theme .o_shopall_sidebar_toggle .o_shopall_sidebar_toggle_desktop {
+        display: inline-block !important;
+    }
+
+    /* If you want to fully hide the internal toggle on desktop, the following stronger selector can be used.
+       It's commented out by default so we only hide the close X as requested.
+    */
+    /*
+    body.o_shopall_theme .o_shopall_sidebar .o_shopall_sidebar_toggle,
+    body.o_shopall_theme .o_shopall_sidebar.d-lg-flex .o_shopall_sidebar_brand_row .o_shopall_sidebar_toggle {
+        display: none !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    */
 }
 
 // Icon-only company control: compact, centered.

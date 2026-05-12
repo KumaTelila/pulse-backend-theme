@@ -12,7 +12,10 @@ patch(NavBar.prototype, {
         this.commandService = useService("command");
         useBus(this.env.bus, "ACTION_MANAGER:UPDATE", () => this.render());
         useBus(this.env.bus, "ACTION_MANAGER:UI-UPDATED", () => this.render());
-        useBus(routerBus, "ROUTE_CHANGE", () => this.render());
+        useBus(routerBus, "ROUTE_CHANGE", () => {
+            document.body.classList.remove('o_shopall_sidebar_mobile_open');
+            this.render();
+        });
     },
 
     openCommandPalette() {
@@ -57,6 +60,11 @@ patch(NavBar.prototype, {
     onShopallCrumbClick(seg, ev) {
         ev.preventDefault();
         seg.onSelected?.();
+    },
+
+    toggleMobileSidebar(ev) {
+        ev.preventDefault();
+        document.body.classList.toggle('o_shopall_sidebar_mobile_open');
     },
 
     /**

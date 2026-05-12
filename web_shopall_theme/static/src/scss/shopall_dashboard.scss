@@ -308,11 +308,46 @@
     .o_shopall_dash_module_panel {
         grid-template-columns: 1fr;
     }
+
+    .o_shopall_dash_chart_head {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .o_shopall_dash_tabs {
+        justify-content: start;
+        gap: 6px;
+    }
+
+    .o_shopall_dash_sales_head,
+    .o_shopall_dash_chart_head {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .o_shopall_dash_module_panel {
+        gap: 10px;
+    }
+
+    .o_shopall_dash_chart_big {
+        font-size: 20px;
+    }
 }
 
 @media (max-width: 575.98px) {
     .o_shopall_dash_module_kpis {
         grid-template-columns: 1fr;
+    }
+
+    .o_shopall_dash_sales_head {
+        padding: 12px;
+    }
+
+    .o_shopall_dash_tabs {
+        gap: 4px;
     }
 }
 

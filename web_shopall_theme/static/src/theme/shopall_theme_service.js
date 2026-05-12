@@ -56,6 +56,8 @@ function applySemanticTokens(theme) {
         ["muted", "--shopall-muted"],
         ["canvas", "--shopall-canvas"],
         ["border", "--shopall-border"],
+        ["on_primary", "--shopall-on-primary"],
+        ["on_muted", "--shopall-on-muted"],
     ];
     for (const [key, prop] of pairs) {
         const h = normalizeHex(theme[key]);
@@ -67,13 +69,13 @@ function applySemanticTokens(theme) {
 
 function clearSemanticTokenOverrides() {
     const root = document.documentElement;
-    for (const prop of ["--shopall-text", "--shopall-muted", "--shopall-canvas", "--shopall-border"]) {
+    for (const prop of ["--shopall-text", "--shopall-muted", "--shopall-canvas", "--shopall-border", "--shopall-on-primary", "--shopall-on-muted"]) {
         root.style.removeProperty(prop);
     }
 }
 
 export const SHOPALL_THEME_PRESETS = [
-    { id: "violet", label: "Shopall", color: "#5b4fec" },
+    { id: "violet", label: "Shopall", color: "#070151" },
     { id: "indigo", label: "Indigo", color: "#4f46e5" },
     { id: "teal", label: "Teal", color: "#0d9488" },
     { id: "rose", label: "Rose", color: "#e11d48" },

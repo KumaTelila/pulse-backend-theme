@@ -9,6 +9,7 @@
             >
                 <t t-if="!state.fullscreen">
                     <ShopallSidebar/>
+                    <div class="o_shopall_sidebar_backdrop d-lg-none" role="button" aria-label="Close sidebar overlay"/>
                 </t>
                 <div class="o_shopall_shell_main">
                     <t t-if="!state.fullscreen">

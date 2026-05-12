@@ -107,8 +107,31 @@ export class ShopallSidebar extends Component {
         onMounted(() => {
             this._syncSidebarCollapsedClass(this.state.sidebarNarrow);
         });
+        onMounted(() => {
+            // Delegate focus handling so focused items are scrolled into view.
+            this._shopallFocusHandler = (ev) => {
+                try {
+                    const target = ev.target;
+                    if (!target) return;
+                    const row = target.closest(
+                        '.o_shopall_sidebar_nav a, .o_shopall_nav_parent, .o_shopall_nav_leaf, .o_shopall_sidebar_app_block button'
+                    );
+                    if (row && row.scrollIntoView) {
+                        row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                    }
+                } catch (e) {
+                    // ignore
+                }
+            };
+            document.addEventListener('focusin', this._shopallFocusHandler, true);
+        });
+
         onWillUnmount(() => {
             document.body.classList.remove("o_shopall_sidebar_collapsed");
+            if (this._shopallFocusHandler) {
+                document.removeEventListener('focusin', this._shopallFocusHandler, true);
+                this._shopallFocusHandler = null;
+            }
         });
         // Re-render for active leaf highlighting only (accordion state is manual).
         useBus(routerBus, "ROUTE_CHANGE", () => {
@@ -139,6 +162,21 @@ export class ShopallSidebar extends Component {
         this.state.sidebarNarrow = next;
         browser.localStorage.setItem(SIDEBAR_NARROW_KEY, next ? "1" : "0");
         this._syncSidebarCollapsedClass(next);
+    }
+
+    onSidebarToggleClick(ev) {
+        ev?.preventDefault?.();
+        ev?.stopPropagation?.();
+        // On small/medium screens, behave as a close button for the mobile sidebar.
+        if (typeof window !== 'undefined' && window.matchMedia) {
+            const isMobile = window.matchMedia('(max-width: 991.98px)').matches;
+            if (isMobile) {
+                this.closeMobileSidebar(ev);
+                return;
+            }
+        }
+        // Otherwise toggle narrow (desktop behavior)
+        return this.toggleSidebarNarrow(ev);
     }
 
     get apps() {
@@ -231,6 +269,22 @@ export class ShopallSidebar extends Component {
         const id = app.id;
         const next = !this.state.expandedApps[id];
         this.state.expandedApps = { ...this.state.expandedApps, [id]: next };
+        // Ensure expanded app row (mega-menu) is scrolled into view if near viewport edges.
+        try {
+            // Delay to allow the accordion animation/DOM changes
+            setTimeout(() => {
+                try {
+                    const el = document.querySelector(`[data-app-id="${id}"]`);
+                    if (el && el.scrollIntoView) {
+                        el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                    }
+                } catch (e) {
+                    // ignore
+                }
+            }, 120);
+        } catch (e) {
+            // ignore
+        }
     }
 
     async onNarrowAppWithoutChildren(app, ev) {
@@ -256,6 +310,26 @@ export class ShopallSidebar extends Component {
         const id = menu.id;
         const next = !this.state.expandedNodes[id];
         this.state.expandedNodes = { ...this.state.expandedNodes, [id]: next };
+        // Scroll the toggled node into the middle of the sidebar view when opened
+        try {
+            setTimeout(() => {
+                try {
+                    const el = document.querySelector(`[data-menu-id="${id}"]`);
+                    if (el && el.scrollIntoView) {
+                        el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                    }
+                } catch (e) {
+                    // ignore
+                }
+            }, 120);
+        } catch (e) {
+            // ignore
+        }
+    }
+
+    closeMobileSidebar(ev) {
+        ev?.preventDefault?.();
+        document.body.classList.remove('o_shopall_sidebar_mobile_open');
     }
 
     hasMenuBranches(menu) {

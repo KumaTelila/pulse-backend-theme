@@ -12,23 +12,7 @@
                         <t t-set="apps" t-value="menuService.getApps()"/>
                     </t>
 
-                    <button
-                        type="button"
-                        class="btn btn-light o_shopall_mobile_sidebar_toggle d-flex d-lg-none align-items-center justify-content-center me-2"
-                        title="Menu"
-                        t-on-click="toggleMobileSidebar"
-                    >
-                        <i class="fa fa-bars o_shopall_toggle_open" aria-hidden="true"/>
-                        <i class="fa fa-times o_shopall_toggle_close" aria-hidden="true"/>
-                    </button>
-                        <button
-                            type="button"
-                            class="btn btn-light o_shopall_mobile_search d-flex d-lg-none align-items-center justify-content-center"
-                            title="Search"
-                            t-on-click="() => this.openCommandPalette()"
-                        >
-                            <i class="fa fa-search" aria-hidden="true"/>
-                        </button>
+                    <!-- Mobile toggler: replaced from AppsMenu small-screen anchor below -->
                     <div
                         t-if="shopallRouteSegments.length"
                         class="o_shopall_navbar_route d-flex align-items-center gap-2 flex-shrink-0 min-w-0 ms-1 d-none d-md-flex"
@@ -97,13 +81,31 @@
         </xpath>
     </t>
 
+    <!-- Remove the default Odoo hamburger icon from AppsMenu.Sidebar when theme is active -->
+    <t t-inherit="web.NavBar.AppsMenu.Sidebar" t-inherit-mode="extension">
+        <xpath expr="//i[contains(@class, 'fa fa-bars')]" position="replace">
+            <!-- removed default hamburger to avoid duplicate icon with theme -->
+        </xpath>
+    </t>
+
     <t t-inherit="web.NavBar.AppsMenu" t-inherit-mode="extension">
         <xpath expr="//div[contains(@class, 'o_navbar_apps_menu')]" position="attributes">
             <attribute name="class" add="o_shopall_navbar_apps_desktop" separator=" "/>
         </xpath>
-        <xpath expr="//a[contains(@class, 'o_menu_toggle')]" position="attributes">
-            <!-- hide core menu toggle: we provide our own mobile toggle -->
-            <attribute name="class" add="d-none" separator=" "/>
+    </t>
+
+    <!-- Replace the small-screen apps anchor with our custom mobile toggler to avoid default behavior -->
+    <t t-inherit="web.NavBar.AppsMenu" t-inherit-mode="extension">
+        <xpath expr="//t[@t-if='this.ui.isSmall']/a[contains(@class, 'o_menu_toggle')]" position="replace">
+            <button
+                type="button"
+                class="btn btn-light border o_shopall_mobile_sidebar_toggle d-flex d-lg-none align-items-center justify-content-center me-2"
+                title="Menu"
+                t-on-click="toggleMobileSidebar"
+            >
+                <i class="fa fa-bars o_shopall_mobile_toggle_bars" aria-hidden="true"/>
+                <i class="fa fa-times o_shopall_mobile_toggle_bars" aria-hidden="true"/>
+            </button>
         </xpath>
     </t>
 

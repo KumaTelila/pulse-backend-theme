@@ -39,13 +39,17 @@
                     type="button"
                     class="o_shopall_sidebar_toggle d-flex align-items-center justify-content-center border-0 bg-white flex-shrink-0 shadow-none"
                     t-att-title="state.sidebarNarrow ? 'Expand sidebar' : 'Collapse sidebar'"
-                    t-on-click="toggleSidebarNarrow"
+                    t-on-click="(ev) => this.onSidebarToggleClick(ev)"
                     t-att-aria-pressed="state.sidebarNarrow ? 'true' : 'false'"
                 >
+                    <!-- Desktop collapse icon (narrow/expand) -->
                     <i
+                        class="o_shopall_sidebar_toggle_desktop fa fa-lg text-muted"
                         aria-hidden="true"
-                        t-attf-class="fa fa-lg text-muted {{ state.sidebarNarrow ? 'fa-angle-double-right' : 'fa-angle-double-left' }}"
+                        t-attf-class="{{ state.sidebarNarrow ? 'fa-angle-double-right' : 'fa-angle-double-left' }}"
                     />
+                    <!-- Mobile close icon (visible when sidebar is open on mobile/medium) -->
+                    <i class="o_shopall_sidebar_toggle_close fa fa-times" aria-hidden="true"/>
                 </button>
             </div>
 
@@ -111,6 +115,7 @@
                         <t t-else="">
                             <div
                                 class="o_shopall_nav_parent d-flex align-items-center gap-2 rounded"
+                                t-att-data-app-id="app.id"
                                 t-att-class="{
                                     collapsed: !isAppExpanded(app),
                                     active: isAppActive(app),
@@ -181,6 +186,7 @@
                     <div
                         class="o_shopall_nav_sub_parent d-flex align-items-center justify-content-between rounded"
                         t-attf-class="o_shopall_nav_level_{{level}}"
+                        t-att-data-menu-id="menu.id"
                         t-att-class="{ collapsed: !isNodeExpanded(menu) }"
                         t-att-style="subFolderRowStyle(level)"
                         role="button"
@@ -209,6 +215,7 @@
                     href="#"
                     class="o_shopall_nav_leaf d-flex align-items-center gap-2 rounded text-decoration-none"
                     t-attf-class="o_shopall_nav_level_{{level}}"
+                    t-att-data-menu-id="menu.id"
                     t-att-class="{'active': isLeafActive(menu)}"
                     t-att-style="leafRowStyle(level)"
                     t-att-href="getMenuItemHref(menu)"

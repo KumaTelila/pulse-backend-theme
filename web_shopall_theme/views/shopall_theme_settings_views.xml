@@ -28,6 +28,14 @@
                                         <field name="shopall_theme_muted" widget="color" class="w-25"/>
                                     </div>
                                     <div class="row mt-2">
+                                        <label for="shopall_theme_on_primary" string="Button text on primary" class="col-lg-3 o_light_label"/>
+                                        <field name="shopall_theme_on_primary" widget="color" class="w-25"/>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <label for="shopall_theme_on_muted" string="Button text on muted" class="col-lg-3 o_light_label"/>
+                                        <field name="shopall_theme_on_muted" widget="color" class="w-25"/>
+                                    </div>
+                                    <div class="row mt-2">
                                         <label for="shopall_theme_canvas" string="Background" class="col-lg-3 o_light_label"/>
                                         <field name="shopall_theme_canvas" widget="color" class="w-25"/>
                                     </div>

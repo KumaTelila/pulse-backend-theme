@@ -1,13 +1,15 @@
 // Runtime-driven accent via --shopall-* (set by shopall_theme_service.js)
 
 :root {
-    --shopall-primary: #5b4fec;
+    --shopall-primary: #070151;
     --shopall-primary-dark: #4338ca;
     --shopall-primary-light: #ede9fd;
     --shopall-text: #1a1a2e;
     --shopall-muted: #6b7280;
     --shopall-border: #eaecf0;
     --shopall-canvas: #f4f5f7;
+    --shopall-on-primary: #ffffff;
+    --shopall-on-muted: #ffffff;
 }
 
 body.o_shopall_theme {
@@ -25,11 +27,37 @@ body.o_shopall_theme {
         }
     }
 
+    // Utility links with ml16 should follow the theme primary color when used as links
+    a.ml16 {
+        color: var(--shopall-primary, #5b4fec) !important;
+        text-decoration: none;
+
+        &:hover,
+        &:focus {
+            color: var(--shopall-primary-dark, #4338ca) !important;
+            text-decoration: underline;
+        }
+    }
+
+    // Nav links (tabs, navs) follow the theme primary color
+    .nav-link {
+        color: var(--shopall-primary, #5b4fec) !important;
+
+        &:hover,
+        &:focus,
+        &.active,
+        &.show,
+        &.active:focus {
+            color: var(--shopall-primary-dark, #4338ca) !important;
+        }
+    }
+
     // Primary actions follow dynamic accent
     .btn-primary,
     .btn-fill-primary {
         background-color: var(--shopall-primary, #5b4fec);
         border-color: var(--shopall-primary, #5b4fec);
+        color: var(--shopall-on-primary, #ffffff) !important;
 
         &:hover,
         &:focus {
@@ -38,10 +66,34 @@ body.o_shopall_theme {
         }
     }
 
+    // Outline primary buttons should follow the dynamic theme as well
+    .btn-outline-primary {
+        color: var(--shopall-primary, #5b4fec) !important;
+        border-color: var(--shopall-primary, #5b4fec) !important;
+        background-color: transparent;
+
+        &:hover,
+        &:focus {
+            color: var(--shopall-on-primary, #ffffff) !important;
+            background-color: var(--shopall-primary, #5b4fec) !important;
+            border-color: var(--shopall-primary, #5b4fec) !important;
+        }
+    }
+
     .text-primary,
     a.o_menu_item:focus,
     .o_menu_item.text-primary {
         color: var(--shopall-primary, #5b4fec) !important;
+    }
+
+    // Secondary text utility follows theme muted token
+    .text-secondary {
+        color: var(--shopall-muted, #6b7280) !important;
+    }
+
+    // Bold truncated text: default to primary (follows Odoo flow when used as primary)
+    .fw-bold.text-truncate {
+        color: var(--shopall-primary, #5b4fec);
     }
 
     .bg-primary {
@@ -60,5 +112,63 @@ body.o_shopall_theme {
     .form-check-input:checked {
         background-color: var(--shopall-primary, #5b4fec);
         border-color: var(--shopall-primary, #5b4fec);
+    }
+
+    // Secondary buttons should use the theme muted token instead of bootstrap gray
+    .btn-secondary,
+    .btn-fill-secondary {
+        background-color: var(--shopall-muted, #6b7280);
+        border-color: var(--shopall-muted, #6b7280);
+        color: var(--shopall-on-muted, #ffffff) !important;
+
+        &:hover,
+        &:focus {
+            background-color: color-mix(in srgb, var(--shopall-muted, #6b7280) 75%, black 25%);
+            border-color: color-mix(in srgb, var(--shopall-muted, #6b7280) 75%, black 25%);
+            color: var(--shopall-on-muted, #ffffff) !important;
+        }
+    }
+
+    // Statistic buttons that use outline-secondary (eg. dashboard stat widgets)
+    .oe_stat_button.btn-outline-secondary,
+    .btn.oe_stat_button.btn-outline-secondary {
+        color: var(--shopall-muted, #6b7280) !important;
+        border-color: var(--shopall-muted, #6b7280) !important;
+        background-color: transparent;
+
+        &:hover,
+        &:focus {
+            color: var(--shopall-on-muted, #ffffff) !important;
+            background-color: var(--shopall-muted, #6b7280) !important;
+            border-color: var(--shopall-muted, #6b7280) !important;
+        }
+    }
+
+    // Ensure icons and stat text inside oe_stat_button follow the button color
+    .oe_stat_button.btn-outline-secondary {
+        i.o_button_icon,
+        .o_field_widget.o_readonly_modifier.o_field_statinfo,
+        .o_stat_value,
+        .o_stat_text {
+            color: inherit !important;
+            fill: currentColor !important;
+        }
+
+        // when hovered/active the inner contents should use the on-muted token
+        &:hover i.o_button_icon,
+        &:hover .o_field_widget.o_readonly_modifier.o_field_statinfo,
+        &:hover .o_stat_value,
+        &:hover .o_stat_text {
+            color: var(--shopall-on-muted, #ffffff) !important;
+        }
+    }
+
+    // Statusbar (workflow steps) should use theme tokens for active/hover/border
+    .o_field_statusbar > .o_statusbar_status,
+    .o_statusbar_status {
+        --o-statusbar-border: var(--shopall-border, #eaecf0);
+        --o-statusbar-background-active: var(--shopall-primary, #5b4fec);
+        --o-statusbar-border-active: var(--shopall-primary-dark, #4338ca);
+        --o-statusbar-background-hover: var(--shopall-primary-light, #ede9fd);
     }
 }

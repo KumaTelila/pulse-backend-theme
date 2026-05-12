@@ -38,11 +38,13 @@ def sanitize_theme_hex(value, default):
 
 # ir.config_parameter keys + HTML design defaults — single source of truth
 SHOPALL_THEME_ICP_DEFAULTS = (
-    ("web_shopall_theme.primary_color", "#5b4fec"),
+    ("web_shopall_theme.primary_color", "#070151"),
     ("web_shopall_theme.text_color", "#1a1a2e"),
     ("web_shopall_theme.muted_color", "#6b7280"),
     ("web_shopall_theme.canvas_color", "#f4f5f7"),
     ("web_shopall_theme.border_color", "#eaecf0"),
+    ("web_shopall_theme.on_primary_color", "#ffffff"),
+    ("web_shopall_theme.on_muted_color", "#ffffff"),
 )
 
 SHOPALL_THEME_APP_ICON_STYLE_DEFAULT = "shopall"
@@ -61,7 +63,7 @@ class ResConfigSettings(models.TransientModel):
     shopall_theme_primary = fields.Char(
         string="Primary accent",
         help="Main brand color: sidebar highlights, primary buttons, tabs (design: --primary).",
-        default="#5b4fec",
+        default="#070151",
         config_parameter="web_shopall_theme.primary_color",
     )
     shopall_theme_text = fields.Char(
@@ -99,12 +101,27 @@ class ResConfigSettings(models.TransientModel):
         config_parameter="web_shopall_theme.app_icon_style",
     )
 
+    shopall_theme_on_primary = fields.Char(
+        string="Button foreground on primary",
+        help="Text/icons color used on primary buttons (design: --on-primary).",
+        default="#ffffff",
+        config_parameter="web_shopall_theme.on_primary_color",
+    )
+    shopall_theme_on_muted = fields.Char(
+        string="Button foreground on muted",
+        help="Text/icons color used on muted/secondary buttons (design: --on-muted).",
+        default="#ffffff",
+        config_parameter="web_shopall_theme.on_muted_color",
+    )
+
     _THEME_FIELDS = (
         "shopall_theme_primary",
         "shopall_theme_text",
         "shopall_theme_muted",
         "shopall_theme_canvas",
         "shopall_theme_border",
+        "shopall_theme_on_primary",
+        "shopall_theme_on_muted",
     )
 
     @api.constrains(*_THEME_FIELDS)
