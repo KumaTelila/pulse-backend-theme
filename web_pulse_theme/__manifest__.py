@@ -12,7 +12,7 @@ Key features include a persistent vertical apps sidebar, a redesigned two-row na
     "maintainer": "Beineto",
     "website": "https://www.linkedin.com/in/kumatelila/",
     "support": "kumatelila26@gmail.com",
-    "license": "LGPL-3",
+    "license": "OPL-1",
     "price": 45.00,
     "currency": "USD",
      'images': [
