@@ -1,13 +1,27 @@
 # -*- coding: utf-8 -*-
 {
-    "name": "Pulse Backend Theme",
+    "name": "Pulse Backend Theme(Community Version)",
     "version": "19.0.1.0.5",
-    "category": "Theme/Backend",
     "summary": "Dashboard-style backend shell: sidebar apps, two-row navbar, accent colors",
-    "depends": ["web", "mail"],
+    "description": """
+Pulse Backend Theme transforms the default Odoo interface into a modern, dashboard-style experience.
+Key features include a persistent vertical apps sidebar, a redesigned two-row navbar, and fully customizable accent colors.
+    """,
+    "category": "Theme/Backend",
+    "author": "Kuma Telila",
+    "maintainer": "Beineto",
+    "website": "https://www.linkedin.com/in/kumatelila/",
+    "support": "kumatelila26@gmail.com",
     "license": "LGPL-3",
+    "price": 45.00,
+    "currency": "USD",
+     'images': [
+        'static/description/banner.png',
+        'static/description/theme_screenshot.png',
+    ],
+    "depends": ["web", "mail"],
     "installable": True,
-    "application": False,
+    "application": True,
     "auto_install": False,
     "data": [
         "security/ir.model.access.csv",
