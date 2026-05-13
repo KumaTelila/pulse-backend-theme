@@ -235,6 +235,13 @@ body.o_pulse_theme.o_pulse_sidebar_collapsed {
     border-radius: 7px;
 }
 
+// Ensure company brand is always bold (fix for server/local inconsistency)
+.o_pulse_sidebar_brand .o_pulse_sidebar_label,
+.o_pulse_navbar_header .oe_topbar_name,
+.o_pulse_navbar_header .o_navbar_brand {
+    font-weight: 700 !important;
+}
+
 .o_pulse_sidebar_nav {
     // scroll area
     min-height: 0;
