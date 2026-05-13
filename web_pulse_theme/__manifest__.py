@@ -15,6 +15,7 @@ Key features include a persistent vertical apps sidebar, a redesigned two-row na
     "license": "OPL-1",
     "price": 45.00,
     "currency": "USD",
+    'live_test_url' : 'http://37.60.243.252:8076/',
      'images': [
         'static/description/banner.png',
         'static/description/theme_screenshot.png',
