@@ -267,26 +267,29 @@ export class PulseSidebar extends Component {
         ev?.preventDefault?.();
         ev?.stopPropagation?.();
         const id = app.id;
-        if (app.actionID) {
+        const hasChildren = this.hasAppTreeChildren(app);
+        const isTodo = app.xmlid === 'project_todo.menu_todo_backend' || app.name === 'To-do';
+
+        if (isTodo && app.actionID) {
+            // To-do app specifically navigates directly
             await this.menuService.selectMenu(app);
-        }
-        const next = !this.state.expandedApps[id];
-        this.state.expandedApps = { ...this.state.expandedApps, [id]: next };
-        // Ensure expanded app row (mega-menu) is scrolled into view if near viewport edges.
-        try {
-            // Delay to allow the accordion animation/DOM changes
-            setTimeout(() => {
-                try {
-                    const el = document.querySelector(`[data-app-id="${id}"]`);
-                    if (el && el.scrollIntoView) {
-                        el.scrollIntoView({ block: 'center', behavior: 'smooth' });
-                    }
-                } catch (e) {
-                    // ignore
-                }
-            }, 120);
-        } catch (e) {
-            // ignore
+        } else if (hasChildren) {
+            // Priority: Expand/Collapse for apps with sub-menus (e.g. Sales)
+            const next = !this.state.expandedApps[id];
+            this.state.expandedApps = { ...this.state.expandedApps, [id]: next };
+            if (next) {
+                setTimeout(() => {
+                    try {
+                        const el = document.querySelector(`[data-app-id="${id}"]`);
+                        if (el && el.scrollIntoView) {
+                            el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                        }
+                    } catch (e) { /* ignore */ }
+                }, 150);
+            }
+        } else if (app.actionID) {
+            // Fallback: Navigate for single-action apps with no children
+            await this.menuService.selectMenu(app);
         }
     }
 
@@ -311,25 +314,23 @@ export class PulseSidebar extends Component {
         ev?.preventDefault?.();
         ev?.stopPropagation?.();
         const id = menu.id;
-        if (menu.actionID) {
+        const hasChildren = this.hasMenuBranches(menu);
+        
+        if (hasChildren) {
+            const next = !this.state.expandedNodes[id];
+            this.state.expandedNodes = { ...this.state.expandedNodes, [id]: next };
+            if (next) {
+                setTimeout(() => {
+                    try {
+                        const el = document.querySelector(`[data-menu-id="${id}"]`);
+                        if (el && el.scrollIntoView) {
+                            el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                        }
+                    } catch (e) { /* ignore */ }
+                }, 150);
+            }
+        } else if (menu.actionID) {
             await this.onMenuLeafClick(menu, ev);
-        }
-        const next = !this.state.expandedNodes[id];
-        this.state.expandedNodes = { ...this.state.expandedNodes, [id]: next };
-        // Scroll the toggled node into the middle of the sidebar view when opened
-        try {
-            setTimeout(() => {
-                try {
-                    const el = document.querySelector(`[data-menu-id="${id}"]`);
-                    if (el && el.scrollIntoView) {
-                        el.scrollIntoView({ block: 'center', behavior: 'smooth' });
-                    }
-                } catch (e) {
-                    // ignore
-                }
-            }, 120);
-        } catch (e) {
-            // ignore
         }
     }
 
