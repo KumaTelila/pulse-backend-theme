@@ -39,8 +39,6 @@
             "web_pulse_theme/static/src/shell/patch_webclient.js",
             "web_pulse_theme/static/src/shell/patch_navbar.js",
             "web_pulse_theme/static/src/theme/pulse_theme_service.js",
-            "web_pulse_theme/static/src/theme/pulse_theme_systray.xml",
-            "web_pulse_theme/static/src/theme/pulse_theme_systray.js",
             "web_pulse_theme/static/src/dashboard/pulse_dashboard.xml",
             "web_pulse_theme/static/src/dashboard/pulse_dashboard.js",
         ],

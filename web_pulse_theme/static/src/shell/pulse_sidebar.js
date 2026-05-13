@@ -263,10 +263,13 @@ export class PulseSidebar extends Component {
         return !!this.state.expandedApps[app.id];
     }
 
-    toggleApp(app, ev) {
+    async toggleApp(app, ev) {
         ev?.preventDefault?.();
         ev?.stopPropagation?.();
         const id = app.id;
+        if (app.actionID) {
+            await this.menuService.selectMenu(app);
+        }
         const next = !this.state.expandedApps[id];
         this.state.expandedApps = { ...this.state.expandedApps, [id]: next };
         // Ensure expanded app row (mega-menu) is scrolled into view if near viewport edges.
@@ -304,10 +307,13 @@ export class PulseSidebar extends Component {
         return !!this.state.expandedNodes[menu.id];
     }
 
-    toggleNode(menu, ev) {
+    async toggleNode(menu, ev) {
         ev?.preventDefault?.();
         ev?.stopPropagation?.();
         const id = menu.id;
+        if (menu.actionID) {
+            await this.onMenuLeafClick(menu, ev);
+        }
         const next = !this.state.expandedNodes[id];
         this.state.expandedNodes = { ...this.state.expandedNodes, [id]: next };
         // Scroll the toggled node into the middle of the sidebar view when opened

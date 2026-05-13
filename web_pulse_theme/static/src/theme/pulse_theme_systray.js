@@ -23,8 +23,6 @@ export class PulseThemeSystray extends Component {
     }
 }
 
-registry.category("systray").add(
-    "web_pulse_theme.systray",
-    { Component: PulseThemeSystray },
-    { sequence: 35 }
-);
+// Theme accent selector removed per user request.
+// Registration was previously:
+// registry.category("systray").add("web_pulse_theme.systray", { Component: PulseThemeSystray }, { sequence: 35 });

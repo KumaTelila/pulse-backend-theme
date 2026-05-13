@@ -88,12 +88,13 @@ body.o_pulse_theme .o_pulse_shell {
             align-items: stretch;
             gap: 12px;
 
-            .o_kanban_group {
+            .o_kanban_group:not(.o_column_folded) {
                 overflow: hidden;
                 border: 1px solid var(--pulse-border, #eaecf0);
                 border-radius: 8px;
                 background: #f8fafc;
                 box-shadow: 0 8px 22px rgba(26, 26, 46, 0.04);
+                transition: background-color 0.2s ease;
 
                 .o_kanban_header {
                     border-bottom: 1px solid var(--pulse-border, #eaecf0);
