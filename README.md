@@ -7,6 +7,7 @@ Pulse Backend Theme transforms the default Odoo interface into a modern, dashboa
 ## Features
 
 - 🚀 **Vertical Apps Sidebar**: Persistent navigation for lightning-fast app switching.
+- 🎨 **Dynamic App Icons**: Switch between Odoo default and custom modern icon packs.
 - 🎨 **Accent Color Customization**: Dynamic theme controls in General Settings.
 - 🛠️ **Two-Row Navbar**: Redesigned top bar for better visibility and navigation.
 - 📱 **Fully Responsive**: Optimized for desktop, tablet, and mobile.
