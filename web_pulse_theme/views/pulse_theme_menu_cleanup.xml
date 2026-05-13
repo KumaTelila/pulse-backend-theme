@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Drop old standalone Settings entry; theme now lives in the Settings app switcher. -->
+    <delete model="ir.ui.menu" id="menu_pulse_theme_settings"/>
+    <delete model="ir.actions.act_window" id="action_pulse_theme_configuration"/>
+</odoo>

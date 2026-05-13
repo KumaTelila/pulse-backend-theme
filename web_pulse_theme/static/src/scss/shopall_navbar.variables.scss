@@ -1,0 +1,16 @@
+// Light top bar like the HTML mockup (white shell + purple accents)
+
+$o-navbar-height: 52px;
+$o-navbar-padding-v: 0px;
+$o-navbar-background: #ffffff;
+$o-navbar-border-bottom: 1px solid #eaecf0;
+
+$o-navbar-entry-color: #6b7280;
+$o-navbar-entry-color--hover: #5b4fec;
+$o-navbar-entry-bg--hover: #ede9fd;
+$o-navbar-entry-color--active: #5b4fec;
+$o-navbar-entry-bg--active: #ede9fd;
+
+$o-navbar-entry-border-radius: 6px;
+$o-navbar-brand-color: #1a1a2e;
+$o-navbar-brand-font-size: 1rem;

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Auth pages share web.login_layout; tag wrap + inject CSS vars from General Settings -->
+    <template id="pulse_login_layout" inherit_id="web.login_layout" name="Pulse auth layout">
+        <xpath expr="//t[@t-call='web.frontend_layout']" position="inside">
+            <t t-set="pageName" t-value="'o_pulse_auth'"/>
+        </xpath>
+        <xpath expr="//div[@class='container py-5']" position="before">
+            <t t-set="pulse_theme_auth" t-value="request.env['ir.http'].pulse_theme_for_portal()"/>
+            <style type="text/css">
+:root {
+  --pulse-primary: <t t-esc="pulse_theme_auth.get('primary')"/>;
+  --pulse-text: <t t-esc="pulse_theme_auth.get('text')"/>;
+  --pulse-muted: <t t-esc="pulse_theme_auth.get('muted')"/>;
+  --pulse-canvas: <t t-esc="pulse_theme_auth.get('canvas')"/>;
+  --pulse-border: <t t-esc="pulse_theme_auth.get('border')"/>;
+}
+            </style>
+        </xpath>
+    </template>
+</odoo>

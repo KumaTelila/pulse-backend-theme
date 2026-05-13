@@ -1,0 +1,758 @@
+// Shell layout: mirrors Atlas pattern (.o_* shell wraps action manager) so flex height/scroll still work.
+
+body.o_pulse_theme.o_web_client {
+    height: 100vh;
+    overflow: hidden;
+    background: var(--pulse-canvas, #f4f5f7);
+}
+
+@media (max-width: 767.98px) {
+    body.o_pulse_theme.o_web_client {
+        height: auto;
+        overflow: auto;
+    }
+}
+
+body.o_pulse_theme.o_web_client > .o_pulse_shell {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.o_pulse_shell {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    min-width: 0;
+    background: var(--pulse-canvas, #f4f5f7);
+}
+
+.o_pulse_shell_main {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--pulse-canvas, #f4f5f7);
+}
+
+// Action manager lives inside shell main (not direct child of .o_web_client anymore).
+.o_pulse_shell .o_action_manager {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: var(--pulse-canvas, #f4f5f7);
+}
+
+.o_pulse_shell .o_action_manager > .o_action {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-flow: column nowrap;
+    overflow: hidden;
+}
+
+.o_pulse_shell .o_content {
+    flex: 1 1 auto;
+    min-height: 0;
+    position: relative;
+    overflow: auto;
+}
+
+.o_pulse_shell .o_content > .o_view_controller {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+}
+
+// ---------------------------------------------------------------------------
+// Sidebar accordion (design: nav-parent / nav-children / nav-sub-parent / nav-leaf)
+// ---------------------------------------------------------------------------
+.o_pulse_sidebar {
+    width: var(--pulse-sidebar-width, 220px);
+    min-width: var(--pulse-sidebar-width, 220px);
+    min-height: 0;
+    z-index: 2;
+    transition: width 0.2s ease, min-width 0.2s ease;
+}
+
+body.o_pulse_theme.o_pulse_sidebar_collapsed {
+    --pulse-sidebar-width: 72px;
+}
+
+.o_pulse_sidebar_brand_row {
+    min-height: 52px;
+    background: #fff;
+}
+
+.o_pulse_sidebar_header_sep {
+    flex-shrink: 0;
+    height: 1px;
+    margin: 0 12px;
+    background: var(--pulse-border, #eaecf0);
+}
+
+.o_pulse_sidebar_toggle {
+    width: 42px;
+    min-width: 42px;
+    cursor: pointer;
+    color: var(--pulse-muted, #6b7280);
+    transition: background-color 0.15s ease, color 0.15s ease;
+    box-shadow: none;
+
+    &:hover {
+        background-color: var(--pulse-canvas, #f4f5f7);
+        color: var(--pulse-primary, #5b4fec);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--pulse-primary, #5b4fec);
+        outline-offset: -2px;
+        z-index: 1;
+    }
+}
+
+/* Ensure icons in the small sidebar toggle have no border/line */
+.o_pulse_sidebar_toggle i {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    color: inherit;
+}
+
+.o_pulse_sidebar_narrow {
+    .o_pulse_sidebar_header_sep {
+        margin-left: 8px;
+        margin-right: 8px;
+    }
+
+    .o_pulse_sidebar_label {
+        display: none !important;
+    }
+
+    .o_pulse_nav_chevron {
+        display: none !important;
+    }
+
+    // Mega-menu flyout lives in an overlay; keep app triggers full-width on the rail.
+    .o_pulse_sidebar_app_block .o-dropdown {
+        display: block;
+        width: 100%;
+    }
+
+    .o_pulse_sidebar_brand {
+        justify-content: center;
+        padding-left: 0.35rem !important;
+        padding-right: 0.35rem !important;
+
+        .o_pulse_sidebar_brand_logo,
+        .o_pulse_sidebar_logo {
+            margin: 0;
+        }
+    }
+
+    .o_pulse_sidebar_item,
+    .o_pulse_nav_parent,
+    .o_pulse_nav_parent_narrow_toggle {
+        justify-content: center;
+        gap: 0 !important;
+    }
+
+    .o_pulse_nav_sub_parent,
+    .o_pulse_nav_leaf {
+        justify-content: center !important;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    .o_pulse_sidebar_footer_item {
+        justify-content: center;
+    }
+
+}
+
+// Narrow sidebar: Odoo Dropdown popover for app submenu (labels visible; not under .o_pulse_sidebar_narrow).
+.o_pulse_sidebar_flyout_menu {
+    min-width: 240px;
+    max-width: #{"min(320px, 85vw)"};
+    max-height: #{"min(70vh, 520px)"};
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+
+    .o_pulse_sidebar_label {
+        display: block !important;
+    }
+
+    .o_pulse_nav_chevron {
+        display: inline-block !important;
+    }
+}
+
+.o_pulse_sidebar_flyout_panel {
+    min-width: 220px;
+}
+
+.o_pulse_sidebar_brand {
+    min-height: 52px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: none;
+
+    &:hover {
+        background-color: var(--pulse-canvas, #f4f5f7);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--pulse-primary, #5b4fec);
+        outline-offset: -2px;
+    }
+
+    &.o_pulse_sidebar_brand_active {
+        background-color: var(--pulse-primary-light, #ede9fd);
+    }
+}
+
+.o_pulse_sidebar_logo {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+    background: var(--pulse-primary, #5b4fec);
+    border-radius: 7px;
+}
+
+.o_pulse_sidebar_brand_logo {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    background: #fff;
+    border: 1px solid var(--pulse-border, #eaecf0);
+    border-radius: 7px;
+}
+
+.o_pulse_sidebar_nav {
+    // scroll area
+    min-height: 0;
+}
+
+/* Hide native scrollbars in the sidebar while keeping scroll functionality */
+.o_pulse_sidebar_nav {
+    overflow: auto;
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+.o_pulse_sidebar_nav::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+.o_pulse_sidebar_item {
+    gap: 9px;
+    padding: 8px 12px;
+    margin: 1px 8px;
+    margin-top: 6px;
+    color: var(--pulse-primary, #5b4fec);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+
+    &:hover {
+        background: var(--pulse-primary-light, #ede9fd);
+        color: var(--pulse-primary, #5b4fec);
+    }
+
+    &.o_pulse_sidebar_item_active {
+        background: var(--pulse-primary-light, #ede9fd);
+        color: var(--pulse-primary, #5b4fec);
+        font-weight: 600;
+    }
+
+    i {
+        width: 20px;
+        text-align: center;
+        flex-shrink: 0;
+    }
+}
+
+// Top-level app row — matches .nav-parent in design HTML
+.o_pulse_nav_parent {
+    gap: 9px;
+    padding: 8px 12px;
+    margin: 1px 8px;
+    color: var(--pulse-primary, #5b4fec);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+        background: var(--pulse-primary-light, #ede9fd);
+    }
+
+    &.active {
+        background: var(--pulse-primary-light, #ede9fd);
+    }
+
+    &.collapsed .o_pulse_nav_chevron {
+        transform: rotate(-90deg);
+    }
+}
+
+.o_pulse_nav_parent_icon {
+    width: 20px;
+    height: 20px;
+    object-fit: cover;
+}
+
+.o_pulse_nav_parent_icon_fa {
+    width: 20px;
+    text-align: center;
+}
+
+.o_pulse_nav_parent_icon_theme {
+    color: var(--pulse-primary, #5b4fec);
+    opacity: 0.9;
+}
+
+.o_pulse_nav_chevron {
+    transition: transform 0.2s ease;
+    color: var(--pulse-primary, #5b4fec);
+}
+
+.o_pulse_nav_children {
+    overflow: hidden;
+    max-height: 2000px;
+    transition: max-height 0.25s ease;
+
+    &.collapsed {
+        max-height: 0;
+    }
+}
+
+// Nested wrapper: no extra horizontal inset (indent comes from row style by depth).
+.o_pulse_nav_nested {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+.o_pulse_nav_sub_parent {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--pulse-primary, #5b4fec);
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+        background: var(--pulse-primary-light, #ede9fd);
+    }
+
+    &.collapsed .o_pulse_nav_chevron {
+        transform: rotate(-90deg);
+    }
+}
+
+.o_pulse_nav_leaf {
+    font-size: 12px;
+    color: var(--pulse-muted, #6b7280);
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+
+    &:hover {
+        background: var(--pulse-primary-light, #ede9fd);
+        color: var(--pulse-primary, #5b4fec);
+    }
+
+    &.active {
+        color: var(--pulse-primary, #5b4fec);
+        font-weight: 600;
+        background: var(--pulse-primary-light, #ede9fd);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Sidebar bottom action
+// ---------------------------------------------------------------------------
+.o_pulse_sidebar_bottom {
+    flex-shrink: 0;
+    border-top: 1px solid var(--pulse-border, #eaecf0);
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    padding: 8px 0;
+}
+
+.o_pulse_sidebar_footer_item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 12px;
+    margin: 1px 8px;
+    border-radius: 6px;
+    color: var(--pulse-muted, #6b7280);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+
+    &:hover {
+        background: var(--pulse-primary-light, #ede9fd);
+        color: var(--pulse-primary, #5b4fec);
+    }
+
+    i {
+        width: 18px;
+        text-align: center;
+        flex-shrink: 0;
+    }
+}
+
+// Desktop: apps live in sidebar; hide grid dropdown trigger (mobile keeps o_menu_toggle).
+@media (min-width: 992px) {
+    .o_pulse_shell .o_pulse_navbar_apps_desktop {
+        display: none !important;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Navbar (single top row)
+// ---------------------------------------------------------------------------
+.o_pulse_navbar_header {
+    flex: 0 0 auto;
+    background: #fff;
+}
+
+.o_pulse_topbar.o_main_navbar {
+    border-bottom: 1px solid var(--pulse-border, #eaecf0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.o_pulse_navbar_route {
+    // Pass through to CSS min(); Sass cannot mix px + vw at compile time.
+    max-width: #{"min(440px, 38vw)"};
+}
+
+.o_pulse_navbar_history {
+    flex-shrink: 0;
+}
+
+.o_pulse_navbar_hist_btn {
+    line-height: 1.2;
+    background: #fff !important;
+}
+
+.o_pulse_navbar_crumb .btn-link {
+    font-size: inherit;
+    line-height: inherit;
+    vertical-align: baseline;
+}
+
+// Mobile sidebar overlay.
+@media (max-width: 991.98px) {
+    .o_pulse_sidebar {
+        display: none !important;
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: #{"min(280px, 80vw)"};
+        max-width: 280px;
+        height: 100%;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+        z-index: 1051;
+        box-shadow: 2px 0 24px rgba(15, 23, 42, 0.18);
+        background: #fff;
+    }
+
+    .o_pulse_sidebar_backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.35);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+        z-index: 1050;
+    }
+
+    body.o_pulse_sidebar_mobile_open {
+        overflow: hidden;
+    }
+
+    body.o_pulse_sidebar_mobile_open .o_pulse_sidebar_backdrop {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    body.o_pulse_sidebar_mobile_open .o_pulse_sidebar.d-none,
+    body.o_pulse_sidebar_mobile_open .o_pulse_sidebar {
+        display: flex !important;
+        transform: translateX(0);
+        left: 0;
+        top: 0;
+        bottom: 0;
+        position: fixed;
+    }
+
+    /* When sidebar is open on mobile, show internal close button and hide desktop collapse icon */
+    body.o_pulse_sidebar_mobile_open .o_pulse_sidebar_toggle {
+        /* ensure the internal toggle sits above the content and is visible */
+        z-index: 1060;
+    }
+    .o_pulse_sidebar_toggle .o_pulse_sidebar_toggle_desktop {
+        display: inline-block;
+    }
+    .o_pulse_sidebar_toggle .o_pulse_sidebar_toggle_close {
+        display: none;
+    }
+    body.o_pulse_sidebar_mobile_open .o_pulse_sidebar_toggle .o_pulse_sidebar_toggle_desktop {
+        display: none !important;
+    }
+    body.o_pulse_sidebar_mobile_open .o_pulse_sidebar_toggle .o_pulse_sidebar_toggle_close {
+        display: inline-block !important;
+    }
+
+    /* Make the internal toggle visible when sidebar is acting as overlay (mobile) */
+    .o_pulse_sidebar.d-none .o_pulse_sidebar_toggle,
+    .o_pulse_sidebar.o_pulse_sidebar_overlay .o_pulse_sidebar_toggle {
+        display: flex;
+    }
+
+    .o_pulse_mobile_sidebar_toggle {
+        min-width: 2.5rem;
+        min-height: 2.5rem;
+        padding: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .o_pulse_mobile_search {
+        min-width: 2.5rem;
+        min-height: 2.5rem;
+        padding: 0.5rem;
+        font-size: 1rem;
+        border: 0 !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        color: var(--pulse-muted, #6b7280);
+
+        &:hover,
+        &:focus {
+            color: var(--pulse-primary, #5b4fec);
+            background: var(--pulse-canvas, #f4f5f7);
+        }
+    }
+
+    /* Hide core apps dropdown toggle (grid) in our navbar to avoid duplicate controls */
+    .o_pulse_navbar_apps_desktop > .o-dropdown,
+    .o_pulse_navbar_header .o_navbar_apps_menu > .o-dropdown {
+        display: none !important;
+    }
+
+    /* Toggle bars / close X icon visibility */
+    .o_pulse_mobile_sidebar_toggle .o_pulse_toggle_close {
+        display: none;
+    }
+    .o_pulse_mobile_sidebar_toggle .o_pulse_toggle_open {
+        display: inline-block;
+    }
+    body.o_pulse_sidebar_mobile_open .o_pulse_mobile_sidebar_toggle .o_pulse_toggle_open {
+        display: none !important;
+    }
+    body.o_pulse_sidebar_mobile_open .o_pulse_mobile_sidebar_toggle .o_pulse_toggle_close {
+        display: inline-block !important;
+    }
+
+    .o_pulse_topbar_search,
+    .o_pulse_navbar_route {
+        display: none !important;
+    }
+
+    .o_pulse_command_search {
+        width: 100%;
+    }
+}
+
+/* Desktop (lg and up) rules: moved outside mobile block so they actually apply */
+@media (min-width: 992px) {
+    /* Hide only the mobile close X inside the internal sidebar toggle on large screens */
+    body.o_pulse_theme .o_pulse_sidebar .o_pulse_sidebar_toggle > i.o_pulse_sidebar_toggle_close,
+    .o_pulse_sidebar_toggle_close {
+        display: none !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+    }
+
+    /* Ensure desktop collapse icon is visible when present */
+    body.o_pulse_theme .o_pulse_sidebar_toggle .o_pulse_sidebar_toggle_desktop {
+        display: inline-block !important;
+    }
+}
+
+// Icon-only company control: compact, centered.
+body.o_pulse_theme .o_switch_company_menu button[data-hotkey="shift+u"] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.25rem;
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
+}
+
+.o_pulse_command_search {
+    max-width: 340px;
+    box-shadow: none;
+    font-size: 12px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.o_pulse_shell_fullscreen .o_pulse_shell_main {
+    background: inherit;
+}
+
+// ---------------------------------------------------------------------------
+// HR employee kanban cards
+// ---------------------------------------------------------------------------
+body.o_pulse_theme .o_hr_employee_kanban {
+    .o_kanban_renderer.o_kanban_ungrouped {
+        --KanbanRecord-width: 390px;
+        --KanbanRecord__image--fill-width: 126px;
+        gap: 14px;
+        padding: 18px;
+        background:
+            linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0)),
+            var(--pulse-canvas, #f4f5f7);
+    }
+
+    .o_kanban_renderer.o_kanban_ungrouped .o_kanban_record {
+        margin: 0;
+    }
+
+    .o_kanban_record:not(.o_kanban_ghost):not(.o-kanban-button-new) {
+        min-height: 162px;
+        padding: 0;
+        overflow: hidden;
+        border: 1px solid rgba(91, 79, 236, 0.12);
+        border-radius: 8px;
+        background: #fff;
+        box-shadow: 0 8px 22px rgba(16, 24, 40, 0.06);
+        transition:
+            border-color 0.16s ease,
+            box-shadow 0.16s ease,
+            transform 0.16s ease;
+
+        &::before {
+            content: "";
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 4px;
+            background: var(--pulse-primary, #5b4fec);
+            opacity: 0;
+            transition: opacity 0.16s ease;
+        }
+
+        &:hover {
+            border-color: rgba(91, 79, 236, 0.28);
+            box-shadow: 0 14px 34px rgba(16, 24, 40, 0.12);
+            transform: translateY(-2px);
+
+            &::before {
+                opacity: 1;
+            }
+        }
+    }
+
+    .o_kanban_record > aside.o_kanban_aside_full {
+        --KanbanRecord__image-height: 100%;
+        flex-basis: var(--KanbanRecord__image--fill-width);
+        overflow: hidden;
+        background: color-mix(in srgb, var(--pulse-primary, #5b4fec) 12%, #fff);
+    }
+
+    .o_kanban_record > aside.o_kanban_aside_full > * {
+        margin-top: 0;
+        margin-bottom: 0;
+        margin-left: 0;
+        height: 100%;
+    }
+
+    .o_kanban_record > aside.o_kanban_aside_full .o_field_background_image,
+    .o_kanban_record > aside.o_kanban_aside_full .o_field_background_image > img,
+    .o_kanban_record > aside.o_kanban_aside_full > div {
+        min-height: 162px;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .o_kanban_record > main {
+        padding: 12px 14px 10px 12px;
+        gap: 4px;
+    }
+
+    .o_kanban_record > main.ms-2 {
+        margin-left: 0 !important;
+    }
+
+    .o_kanban_record > main > div:first-child {
+        min-height: 28px;
+        padding-right: 28px;
+
+        .o_field_widget[name="name"],
+        .fw-bold,
+        .fw-bolder {
+            color: var(--pulse-text, #1a1a2e);
+            font-size: 1.05rem !important;
+            line-height: 1.25;
+            letter-spacing: 0;
+        }
+    }
+
+    .o_kanban_record .float-end {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+    }
+
+    .o_kanban_record main > div:not(:first-child),
+    .o_kanban_record main > span,
+    .o_kanban_record main > .o_field_widget {
+        color: var(--pulse-text, #1a1a2e);
+        font-size: 0.9rem;
+        line-height: 1.35;
+    }
+
+    .o_kanban_record i.text-primary {
+        width: 18px;
+        margin-right: 8px !important;
+        color: var(--pulse-primary, #5b4fec) !important;
+        text-align: center;
+        opacity: 0.92;
+    }
+
+    .hr_tags {
+        margin: 6px 0 0;
+    }
+
+    .o_tag {
+        border: 0;
+        border-radius: 999px;
+        padding: 3px 10px;
+        font-size: 0.76rem;
+        font-weight: 650;
+    }
+
+    footer,
+    main > footer {
+        padding-top: 4px;
+    }
+}
