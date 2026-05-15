@@ -132,7 +132,7 @@
                                 />
                                 <i t-else="" t-att-class="appThemeIconClass(app) + ' o_pulse_nav_parent_icon_fa o_pulse_nav_parent_icon_theme'" aria-hidden="true"/>
                                 <span class="o_pulse_sidebar_label text-truncate fw-semibold flex-grow-1" t-esc="app.name"/>
-                                <i class="fa fa-chevron-up o_pulse_nav_chevron small" aria-hidden="true"/>
+                                <i t-if="hasAppTreeChildren(app)" class="fa fa-chevron-up o_pulse_nav_chevron small" aria-hidden="true"/>
                             </div>
                             <div
                                 class="o_pulse_nav_children"
