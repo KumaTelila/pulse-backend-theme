@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!-- Same extension strategy as Atlas: shell wraps sidebar + main column; remove duplicate action/main containers. -->
+    <t t-inherit="web.WebClient" t-inherit-mode="extension">
+        <xpath expr="//t[@t-if='!state.fullscreen']" position="replace">
+            <div
+                class="o_pulse_shell"
+                t-att-class="{'o_pulse_shell_fullscreen': state.fullscreen}"
+            >
+                <t t-if="!state.fullscreen">
+                    <PulseSidebar/>
+                    <div class="o_pulse_sidebar_backdrop d-lg-none" role="button" aria-label="Close sidebar overlay"/>
+                </t>
+                <div class="o_pulse_shell_main">
+                    <t t-if="!state.fullscreen">
+                        <NavBar/>
+                    </t>
+                    <ActionContainer/>
+                    <MainComponentsContainer/>
+                </div>
+            </div>
+        </xpath>
+        <xpath expr="/t/ActionContainer" position="replace"/>
+        <xpath expr="/t/MainComponentsContainer" position="replace"/>
+    </t>
+</templates>

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!-- Single top row: apps, route, search, systray (app names live in sidebar + breadcrumbs). -->
+    <t t-inherit="web.NavBar" t-inherit-mode="extension">
+        <xpath expr="//header[contains(@class, 'o_navbar')]" position="replace">
+            <header class="o_navbar o_pulse_navbar_header" t-ref="root">
+                <nav
+                    class="o_main_navbar d-print-none o_pulse_topbar align-items-center"
+                    data-command-category="disabled"
+                >
+                    <t t-call="web.NavBar.AppsMenu">
+                        <t t-set="apps" t-value="menuService.getApps()"/>
+                    </t>
+
+                    <button
+                        type="button"
+                        class="btn btn-light o_pulse_mobile_sidebar_toggle d-flex d-lg-none align-items-center justify-content-center me-2"
+                        title="Menu"
+                        t-on-click="toggleMobileSidebar"
+                    >
+                        <i class="fa fa-bars o_pulse_toggle_open" aria-hidden="true"/>
+                        <i class="fa fa-times o_pulse_toggle_close" aria-hidden="true"/>
+                    </button>
+                        <button
+                            type="button"
+                            class="btn btn-light o_pulse_mobile_search d-flex d-lg-none align-items-center justify-content-center"
+                            title="Search"
+                            t-on-click="() => this.openCommandPalette()"
+                        >
+                            <i class="fa fa-search" aria-hidden="true"/>
+                        </button>
+                    <div
+                        t-if="pulseRouteSegments.length"
+                        class="o_pulse_navbar_route d-flex align-items-center gap-2 flex-shrink-0 min-w-0 ms-1 d-none d-md-flex"
+                    >
+                        <div class="btn-group o_pulse_navbar_history shadow-sm" role="group" aria-label="History">
+                            <button
+                                type="button"
+                                class="btn btn-light border o_pulse_navbar_hist_btn py-1 px-2"
+                                title="Back"
+                                t-on-click="onPulseHistoryBack"
+                            >
+                                <i class="fa fa-chevron-left small" aria-hidden="true"/>
+                            </button>
+                            <button
+                                type="button"
+                                class="btn btn-light border o_pulse_navbar_hist_btn py-1 px-2"
+                                title="Forward"
+                                t-on-click="onPulseHistoryForward"
+                            >
+                                <i class="fa fa-chevron-right small" aria-hidden="true"/>
+                            </button>
+                        </div>
+                        <div class="o_pulse_navbar_crumb text-truncate small lh-sm">
+                            <t t-foreach="pulseRouteSegments" t-as="seg" t-key="seg.jsId">
+                                <t t-if="seg_index > 0">
+                                    <span class="text-muted"> / </span>
+                                </t>
+                                <t t-if="seg.isLast">
+                                    <span class="fw-bold text-dark" t-esc="seg.name"/>
+                                </t>
+                                <t t-else="">
+                                    <button
+                                        type="button"
+                                        class="btn btn-link btn-sm p-0 align-baseline text-muted text-decoration-none"
+                                        t-on-click="(ev) => this.onPulseCrumbClick(seg, ev)"
+                                    >
+                                        <t t-esc="seg.name"/>
+                                    </button>
+                                </t>
+                            </t>
+                        </div>
+                    </div>
+
+                    <div class="o_pulse_topbar_search flex-grow-1 px-2 d-none d-md-flex justify-content-center">
+                        <button
+                            type="button"
+                            class="btn btn-light border rounded-pill w-100 o_pulse_command_search text-start"
+                            title="Search menus and commands (Ctrl+K)"
+                            t-on-click="() => this.openCommandPalette()"
+                        >
+                            <i class="fa fa-search me-2" aria-hidden="true"/>
+                            <span class="text-muted">Search menus and commands…</span>
+                        </button>
+                    </div>
+
+                    <div class="o_menu_systray d-flex flex-shrink-0 ms-auto bg-inherit o_pulse_systray" role="menu">
+                        <t t-foreach="systrayItems" t-as="item" t-key="item.key">
+                            <div t-att-data-index="item.index"/>
+                            <ErrorHandler onError="error => this.handleItemError(error, item)">
+                                <t t-component="item.Component" t-props="item.props"/>
+                            </ErrorHandler>
+                        </t>
+                    </div>
+                </nav>
+            </header>
+        </xpath>
+    </t>
+
+    <t t-inherit="web.NavBar.AppsMenu" t-inherit-mode="extension">
+        <xpath expr="//div[contains(@class, 'o_navbar_apps_menu')]" position="attributes">
+            <attribute name="class" add="o_pulse_navbar_apps_desktop" separator=" "/>
+        </xpath>
+        <xpath expr="//a[contains(@class, 'o_menu_toggle')]" position="attributes">
+            <!-- hide core menu toggle: we provide our own mobile toggle -->
+            <attribute name="class" add="d-none" separator=" "/>
+        </xpath>
+    </t>
+
+    <!-- Company switcher: visible on all breakpoints (core uses d-none d-md-block). -->
+    <t t-inherit="web.SwitchCompanyMenu" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('o_switch_company_menu')]" position="attributes">
+            <attribute name="class">o_switch_company_menu</attribute>
+        </xpath>
+        <xpath expr="//div[hasclass('o_switch_company_menu')]//i[contains(@class, 'fa-building')]" position="attributes">
+            <attribute name="class">fa fa-building</attribute>
+        </xpath>
+        <xpath expr="//div[hasclass('o_switch_company_menu')]//span[hasclass('oe_topbar_name')]" position="replace">
+            <span class="oe_topbar_name visually-hidden" t-esc="companyService.currentCompany.name"/>
+        </xpath>
+    </t>
+</templates>

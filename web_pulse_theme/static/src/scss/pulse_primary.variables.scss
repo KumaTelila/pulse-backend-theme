@@ -1,0 +1,16 @@
+// Pulse dashboard tokens — compiled defaults; runtime accent via CSS variables (see pulse_dynamic.scss)
+
+$o-pulse-primary: #070151 !default;
+$o-pulse-text: #1a1a2e !default;
+$o-pulse-muted: #6b7280 !default;
+$o-pulse-border: #eaecf0 !default;
+$o-pulse-canvas: #f4f5f7 !default;
+
+$o-brand-odoo: $o-pulse-primary !default;
+$o-brand-primary: $o-pulse-primary !default;
+$o-action: $o-pulse-primary !default;
+
+$o-main-text-color: $o-pulse-text !default;
+$o-main-color-muted: $o-pulse-muted !default;
+
+$o-gray-100: #f8f9fa !default; // keep BS scale but align border

@@ -1,0 +1,174 @@
+// Runtime-driven accent via --pulse-* (set by pulse_theme_service.js)
+
+:root {
+    --pulse-primary: #070151;
+    --pulse-primary-dark: #4338ca;
+    --pulse-primary-light: #ede9fd;
+    --pulse-text: #1a1a2e;
+    --pulse-muted: #6b7280;
+    --pulse-border: #eaecf0;
+    --pulse-canvas: #f4f5f7;
+    --pulse-on-primary: #ffffff;
+    --pulse-on-muted: #ffffff;
+}
+
+body.o_pulse_theme {
+    // Top row: keep systray / apps controls readable on the light bar. A hover-only
+    // rule made toggles look “empty” until hover when other layers won on color/opacity.
+    .o_pulse_topbar .dropdown-toggle:not(.o-dropdown-toggle-custo),
+    .o_pulse_topbar .o_navbar_apps_menu button {
+        color: var(--pulse-muted, #6b7280);
+        opacity: 1;
+
+        &:hover,
+        &:focus-visible,
+        &.show {
+            color: var(--pulse-primary, #5b4fec);
+        }
+    }
+
+    // Utility links with ml16 should follow the theme primary color when used as links
+    a.ml16 {
+        color: var(--pulse-primary, #5b4fec) !important;
+        text-decoration: none;
+
+        &:hover,
+        &:focus {
+            color: var(--pulse-primary-dark, #4338ca) !important;
+            text-decoration: underline;
+        }
+    }
+
+    // Nav links (tabs, navs) follow the theme primary color
+    .nav-link {
+        color: var(--pulse-primary, #5b4fec) !important;
+
+        &:hover,
+        &:focus,
+        &.active,
+        &.show,
+        &.active:focus {
+            color: var(--pulse-primary-dark, #4338ca) !important;
+        }
+    }
+
+    // Primary actions follow dynamic accent
+    .btn-primary,
+    .btn-fill-primary {
+        background-color: var(--pulse-primary, #5b4fec);
+        border-color: var(--pulse-primary, #5b4fec);
+        color: var(--pulse-on-primary, #ffffff) !important;
+
+        &:hover,
+        &:focus {
+            background-color: var(--pulse-primary-dark, #4338ca);
+            border-color: var(--pulse-primary-dark, #4338ca);
+        }
+    }
+
+    // Outline primary buttons should follow the dynamic theme as well
+    .btn-outline-primary {
+        color: var(--pulse-primary, #5b4fec) !important;
+        border-color: var(--pulse-primary, #5b4fec) !important;
+        background-color: transparent;
+
+        &:hover,
+        &:focus {
+            color: var(--pulse-on-primary, #ffffff) !important;
+            background-color: var(--pulse-primary, #5b4fec) !important;
+            border-color: var(--pulse-primary, #5b4fec) !important;
+        }
+    }
+
+    .text-primary,
+    a.o_menu_item:focus,
+    .o_menu_item.text-primary {
+        color: var(--pulse-primary, #5b4fec) !important;
+    }
+
+    // Secondary text utility follows theme muted token
+    .text-secondary {
+        color: var(--pulse-muted, #6b7280) !important;
+    }
+
+    // Bold truncated text: default to primary (follows Odoo flow when used as primary)
+    .fw-bold.text-truncate {
+        color: var(--pulse-primary, #5b4fec);
+    }
+
+    .bg-primary {
+        background-color: var(--pulse-primary, #5b4fec) !important;
+    }
+
+    .border-primary {
+        border-color: var(--pulse-primary, #5b4fec) !important;
+    }
+
+    .badge.text-bg-primary,
+    span.bg-primary {
+        background-color: var(--pulse-primary, #5b4fec) !important;
+    }
+
+    .form-check-input:checked {
+        background-color: var(--pulse-primary, #5b4fec);
+        border-color: var(--pulse-primary, #5b4fec);
+    }
+
+    // Secondary buttons should use the theme muted token instead of bootstrap gray
+    .btn-secondary,
+    .btn-fill-secondary {
+        background-color: var(--pulse-muted, #6b7280);
+        border-color: var(--pulse-muted, #6b7280);
+        color: var(--pulse-on-muted, #ffffff) !important;
+
+        &:hover,
+        &:focus {
+            background-color: color-mix(in srgb, var(--pulse-muted, #6b7280) 75%, black 25%);
+            border-color: color-mix(in srgb, var(--pulse-muted, #6b7280) 75%, black 25%);
+            color: var(--pulse-on-muted, #ffffff) !important;
+        }
+    }
+
+    // Statistic buttons that use outline-secondary (eg. dashboard stat widgets)
+    .oe_stat_button.btn-outline-secondary,
+    .btn.oe_stat_button.btn-outline-secondary {
+        color: var(--pulse-muted, #6b7280) !important;
+        border-color: var(--pulse-muted, #6b7280) !important;
+        background-color: transparent;
+
+        &:hover,
+        &:focus {
+            color: var(--pulse-on-muted, #ffffff) !important;
+            background-color: var(--pulse-muted, #6b7280) !important;
+            border-color: var(--pulse-muted, #6b7280) !important;
+        }
+    }
+
+    // Ensure icons and stat text inside oe_stat_button follow the button color
+    .oe_stat_button.btn-outline-secondary {
+        i.o_button_icon,
+        .o_field_widget.o_readonly_modifier.o_field_statinfo,
+        .o_stat_value,
+        .o_stat_text {
+            color: inherit !important;
+            fill: currentColor !important;
+        }
+
+        // when hovered/active the inner contents should use the on-muted token
+        &:hover i.o_button_icon,
+        &:hover .o_field_widget.o_readonly_modifier.o_field_statinfo,
+        &:hover .o_stat_value,
+        &:hover .o_stat_text {
+            color: var(--pulse-on-muted, #ffffff) !important;
+        }
+    }
+
+    // Statusbar (workflow steps) should use theme tokens for active/hover/border
+    .o_field_statusbar > .o_statusbar_status,
+    .o_statusbar_status {
+        --o-statusbar-border: var(--pulse-border, #eaecf0);
+        --o-statusbar-background-active: var(--pulse-primary, #5b4fec);
+        --o-statusbar-border-active: var(--pulse-primary-dark, #4338ca);
+        --o-statusbar-background-hover: var(--pulse-primary-light, #ede9fd);
+    }
+}

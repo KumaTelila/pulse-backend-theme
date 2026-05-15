@@ -1,0 +1,176 @@
+# Part of web_pulse_theme. See LICENSE file for full copyright and licensing details.
+
+import re
+
+from odoo import _, api, fields, models
+from odoo.exceptions import ValidationError
+
+_HEX6 = re.compile(r"^#[0-9a-fA-F]{6}$")
+_HEX3 = re.compile(r"^#[0-9a-fA-F]{3}$")
+
+
+def _expand_short_hex(hex_str):
+    r, g, b = hex_str[1], hex_str[2], hex_str[3]
+    return f"#{r}{r}{g}{g}{b}{b}".lower()
+
+
+def strict_theme_hex(value):
+    """Return normalized #rrggbb or None if *value* is not a valid hex color."""
+    if not value or not isinstance(value, str):
+        return None
+    v = value.strip()
+    if not v:
+        return None
+    if not v.startswith("#"):
+        v = f"#{v}"
+    if _HEX3.match(v):
+        v = _expand_short_hex(v)
+    if _HEX6.match(v):
+        return v.lower()
+    return None
+
+
+def sanitize_theme_hex(value, default):
+    """Return normalized #rrggbb or *default*."""
+    ok = strict_theme_hex(value)
+    return ok if ok is not None else default
+
+
+# ir.config_parameter keys + HTML design defaults — single source of truth
+PULSE_THEME_ICP_DEFAULTS = (
+    ("web_pulse_theme.primary_color", "#070151"),
+    ("web_pulse_theme.text_color", "#1a1a2e"),
+    ("web_pulse_theme.muted_color", "#6b7280"),
+    ("web_pulse_theme.canvas_color", "#f4f5f7"),
+    ("web_pulse_theme.border_color", "#eaecf0"),
+    ("web_pulse_theme.on_primary_color", "#ffffff"),
+    ("web_pulse_theme.on_muted_color", "#ffffff"),
+)
+
+PULSE_THEME_APP_ICON_STYLE_DEFAULT = "pulse"
+PULSE_THEME_APP_ICON_STYLES = ("pulse", "odoo")
+
+
+def pulse_theme_icp_session_key(icp_key):
+    """web_pulse_theme.primary_color -> primary"""
+    short = icp_key.split(".")[-1]
+    return short.replace("_color", "") if short.endswith("_color") else short
+
+
+class ResConfigSettings(models.TransientModel):
+    _inherit = "res.config.settings"
+
+    pulse_theme_primary = fields.Char(
+        string="Primary accent",
+        help="Main brand color: sidebar highlights, primary buttons, tabs (design: --primary).",
+        default="#070151",
+        config_parameter="web_pulse_theme.primary_color",
+    )
+    pulse_theme_text = fields.Char(
+        string="Main text",
+        help="Primary text color (design: --text).",
+        default="#1a1a2e",
+        config_parameter="web_pulse_theme.text_color",
+    )
+    pulse_theme_muted = fields.Char(
+        string="Muted text",
+        help="Secondary labels and nav leaf color (design: --text-muted).",
+        default="#6b7280",
+        config_parameter="web_pulse_theme.muted_color",
+    )
+    pulse_theme_canvas = fields.Char(
+        string="Background",
+        help="App canvas / page background (design: --bg).",
+        default="#f4f5f7",
+        config_parameter="web_pulse_theme.canvas_color",
+    )
+    pulse_theme_border = fields.Char(
+        string="Borders",
+        help="Dividers and light borders.",
+        default="#eaecf0",
+        config_parameter="web_pulse_theme.border_color",
+    )
+    pulse_theme_app_icon_style = fields.Selection(
+        [
+            ("pulse", "Pulse theme icons"),
+            ("odoo", "Default Odoo icons"),
+        ],
+        string="App icons",
+        help="Choose whether sidebar app icons use the Pulse theme icon set or each app's default Odoo icon.",
+        default=PULSE_THEME_APP_ICON_STYLE_DEFAULT,
+        config_parameter="web_pulse_theme.app_icon_style",
+    )
+
+    pulse_theme_on_primary = fields.Char(
+        string="Button foreground on primary",
+        help="Text/icons color used on primary buttons (design: --on-primary).",
+        default="#ffffff",
+        config_parameter="web_pulse_theme.on_primary_color",
+    )
+    pulse_theme_on_muted = fields.Char(
+        string="Button foreground on muted",
+        help="Text/icons color used on muted/secondary buttons (design: --on-muted).",
+        default="#ffffff",
+        config_parameter="web_pulse_theme.on_muted_color",
+    )
+
+    _THEME_FIELDS = (
+        "pulse_theme_primary",
+        "pulse_theme_text",
+        "pulse_theme_muted",
+        "pulse_theme_canvas",
+        "pulse_theme_border",
+        "pulse_theme_on_primary",
+        "pulse_theme_on_muted",
+    )
+
+    @api.constrains(*_THEME_FIELDS)
+    def _check_pulse_theme_hex(self):
+        labels = {
+            "pulse_theme_primary": "Primary accent",
+            "pulse_theme_text": "Main text",
+            "pulse_theme_muted": "Muted text",
+            "pulse_theme_canvas": "Background",
+            "pulse_theme_border": "Borders",
+        }
+        for rec in self:
+            for fname in self._THEME_FIELDS:
+                raw = getattr(rec, fname)
+                if raw and strict_theme_hex(raw) is None:
+                    raise ValidationError(
+                        _(
+                            "%(label)s must be a valid CSS hex color (e.g. #5b4fec).",
+                            label=labels[fname],
+                        )
+                    )
+
+    def set_values(self):
+        super().set_values()
+        icp = self.env["ir.config_parameter"].sudo()
+        for param, default in PULSE_THEME_ICP_DEFAULTS:
+            cur = icp.get_param(param, default)
+            icp.set_param(param, sanitize_theme_hex(cur, default))
+        icon_style = icp.get_param(
+            "web_pulse_theme.app_icon_style",
+            PULSE_THEME_APP_ICON_STYLE_DEFAULT,
+        )
+        if icon_style not in PULSE_THEME_APP_ICON_STYLES:
+            icp.set_param(
+                "web_pulse_theme.app_icon_style",
+                PULSE_THEME_APP_ICON_STYLE_DEFAULT,
+            )
+
+    def action_pulse_theme_reset_defaults(self):
+        """Restore design-default colors in ir.config_parameter and reload the UI."""
+        self.ensure_one()
+        icp = self.env["ir.config_parameter"].sudo()
+        for param, value in PULSE_THEME_ICP_DEFAULTS:
+            icp.set_param(param, value)
+        icp.set_param(
+            "web_pulse_theme.app_icon_style",
+            PULSE_THEME_APP_ICON_STYLE_DEFAULT,
+        )
+        return {
+            "type": "ir.actions.client",
+            "tag": "soft_reload",
+        }

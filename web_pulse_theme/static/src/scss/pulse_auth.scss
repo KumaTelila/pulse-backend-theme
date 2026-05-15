@@ -1,0 +1,82 @@
+// Login / signup / reset password (web.login_layout → web.frontend_layout)
+// Defaults match HTML design; :root --pulse-* overridden per-request in pulse_auth_templates.xml.
+
+:root {
+    --pulse-primary: #5b4fec;
+    --pulse-text: #1a1a2e;
+    --pulse-muted: #6b7280;
+    --pulse-canvas: #f4f5f7;
+    --pulse-border: #eaecf0;
+}
+
+// Only auth screens (wrapwrap gets class o_pulse_auth from login_layout inherit).
+body:has(#wrapwrap.o_pulse_auth) {
+    font-family:
+        "Segoe UI",
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
+    background-color: var(--pulse-canvas) !important;
+}
+
+#wrapwrap.o_pulse_auth {
+    min-height: 100vh;
+    color: var(--pulse-text);
+
+    main {
+        background-color: transparent;
+    }
+
+    .card {
+        background-color: #fff !important;
+        box-shadow: 0 4px 24px rgba(26, 26, 46, 0.06);
+    }
+
+    .field-login label,
+    .form-label {
+        color: var(--pulse-text);
+    }
+
+    .form-control {
+        border-color: var(--pulse-border);
+
+        &:focus {
+            border-color: var(--pulse-primary);
+            box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--pulse-primary) 22%, transparent);
+        }
+    }
+
+    .btn-primary {
+        background-color: var(--pulse-primary) !important;
+        border-color: var(--pulse-primary) !important;
+
+        &:hover,
+        &:focus {
+            background-color: color-mix(in srgb, var(--pulse-primary) 72%, #000) !important;
+            border-color: color-mix(in srgb, var(--pulse-primary) 72%, #000) !important;
+        }
+    }
+
+    a:not(.btn) {
+        color: var(--pulse-primary);
+
+        &:hover {
+            color: color-mix(in srgb, var(--pulse-primary) 72%, #000);
+        }
+    }
+
+    .btn-link {
+        color: var(--pulse-primary);
+    }
+
+    .border-bottom,
+    .border-top {
+        border-color: var(--pulse-border) !important;
+    }
+
+    .text-muted,
+    small.text-muted {
+        color: var(--pulse-muted) !important;
+    }
+}

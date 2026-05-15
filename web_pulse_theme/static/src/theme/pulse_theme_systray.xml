@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+  <t t-name="web_pulse_theme.PulseThemeSystray">
+    <div class="o_pulse_theme_systray d-none d-md-flex" aria-label="Theme">
+      <Dropdown>
+        <button class="border-0 bg-transparent text-muted lh-1 p-2 rounded-1" title="Accent color">
+          <i class="fa fa-circle fs-5" t-attf-style="color: var(--pulse-primary, #5b4fec);"/>
+        </button>
+        <t t-set-slot="content">
+          <div class="dropdown-header text-uppercase small fw-bold">Accent</div>
+          <div class="px-3 pb-2 d-flex flex-wrap gap-1">
+            <t t-foreach="theme.presets" t-as="p" t-key="p.id">
+              <button
+                type="button"
+                class="rounded-circle border-0 p-0"
+                style="width: 28px; height: 28px;"
+                t-att-title="p.label"
+                t-attf-style="background-color: {{ p.color }}"
+                t-on-click="() => this.onPickPreset(p.color)"
+              />
+            </t>
+          </div>
+          <div class="dropdown-divider"/>
+          <button type="button" class="dropdown-item" t-on-click="() => this.onReset()">Reset to default</button>
+        </t>
+      </Dropdown>
+    </div>
+  </t>
+</templates>
